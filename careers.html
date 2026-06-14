@@ -275,10 +275,189 @@
     </div>
 
 
-    <div class="content">
-        <h1>Coming Soon</h1>
-        <p>We are currently shaping the future of deep tech. Check back soon for exciting career opportunities at SMPS Tech Lab.</p>
-        <a href="contact.html" style="margin-top:32px; color:var(--accent); text-decoration:none; font-weight:600;">Join our talent pool →</a>
+    <!-- Careers Hero Section -->
+    <section style="padding: 100px 24px 60px; text-align: center; background: linear-gradient(180deg, rgba(59,130,246,0.06) 0%, transparent 100%);">
+        <div style="max-width: 720px; margin: 0 auto;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); border-radius: 100px; padding: 6px 16px; margin-bottom: 24px;">
+                <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                <span style="font-size: 13px; color: var(--accent); font-weight: 500; letter-spacing: 0.5px;">We're Hiring</span>
+            </div>
+            <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(36px, 6vw, 56px); font-weight: 800; line-height: 1.1; margin-bottom: 20px;">Shape the Future of<br><span style="color: var(--accent);">Deep Tech</span></h1>
+            <p style="color: var(--muted); font-size: 18px; line-height: 1.7; margin-bottom: 36px;">Join SMPS Tech Lab — where academia meets industry. Work on cutting-edge power electronics, VLSI, IoT, and AI projects that matter.</p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="contact.html" style="background: var(--accent); color: #fff; padding: 13px 28px; border-radius: 10px; font-weight: 600; text-decoration: none; font-size: 15px; transition: all .2s;">Apply Now →</a>
+                <a href="contact.html" style="background: transparent; color: var(--text); padding: 13px 28px; border-radius: 10px; font-weight: 600; text-decoration: none; font-size: 15px; border: 1px solid var(--border); transition: all .2s;">Submit Resume</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Job Listings -->
+    <section style="padding: 20px 24px 80px; max-width: 960px; margin: 0 auto; width: 100%;">
+        <!-- Filter Bar -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
+            <span style="color: var(--muted); font-size: 14px;">Filter:</span>
+            <button class="job-filter active" data-filter="all" onclick="filterJobs('all', this)">All Positions</button>
+            <button class="job-filter" data-filter="Full-time" onclick="filterJobs('Full-time', this)">Full-time</button>
+            <button class="job-filter" data-filter="Internship" onclick="filterJobs('Internship', this)">Internship</button>
+            <button class="job-filter" data-filter="Contract" onclick="filterJobs('Contract', this)">Contract</button>
+        </div>
+
+        <div id="jobsGrid" style="display: flex; flex-direction: column; gap: 16px;">
+            <!-- Loaded dynamically -->
+            <div id="jobsLoading" style="text-align: center; padding: 60px; color: var(--muted);">
+                <div style="font-size: 40px; margin-bottom: 12px;">⏳</div>
+                <p>Loading opportunities...</p>
+            </div>
+        </div>
+
+        <div id="noJobsMsg" style="display:none; text-align:center; padding:80px 24px;">
+            <div style="font-size: 60px; margin-bottom: 16px;">🎓</div>
+            <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; margin-bottom: 12px;">No openings right now</h3>
+            <p style="color: var(--muted); font-size: 16px; max-width: 420px; margin: 0 auto;">We're always looking for passionate people. Send us your resume and we'll reach out when the right role opens up.</p>
+            <a href="contact.html" style="display: inline-block; margin-top: 24px; background: var(--accent); color: #fff; padding: 12px 28px; border-radius: 10px; font-weight: 600; text-decoration: none;">Join Talent Pool →</a>
+        </div>
+    </section>
+
+    <style>
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .job-filter {
+            padding: 6px 16px; border-radius: 100px;
+            border: 1px solid var(--border);
+            background: transparent; color: var(--muted);
+            font-size: 13px; cursor: pointer; transition: all .2s;
+        }
+        .job-filter.active, .job-filter:hover {
+            background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+        .job-card {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px 28px;
+            display: flex; align-items: center; gap: 20px;
+            transition: all .25s; cursor: pointer;
+        }
+        .job-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .job-type-badge {
+            padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600;
+        }
+        .badge-full { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .badge-intern { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .badge-contract { background: rgba(234,179,8,0.15); color: #fcd34d; }
+        .badge-other { background: rgba(100,116,139,0.1); color: var(--muted); }
+        .job-status-open { color: #22c55e; font-size: 12px; font-weight: 600; }
+        .job-status-closed { color: var(--muted); font-size: 12px; font-weight: 600; }
+    </style>
+
+    <script>
+        let allJobs = [];
+        let currentFilter = 'all';
+
+        function getBadgeClass(type) {
+            if (type === 'Full-time') return 'badge-full';
+            if (type === 'Internship') return 'badge-intern';
+            if (type === 'Contract') return 'badge-contract';
+            return 'badge-other';
+        }
+
+        function renderJobs(jobs) {
+            const grid = document.getElementById('jobsGrid');
+            const noMsg = document.getElementById('noJobsMsg');
+            document.getElementById('jobsLoading').style.display = 'none';
+
+            const openJobs = jobs.filter(j => j.status === 'open');
+
+            if (!openJobs.length) {
+                grid.style.display = 'none';
+                noMsg.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'flex';
+            noMsg.style.display = 'none';
+
+            grid.innerHTML = openJobs.map(j => `
+                <div class="job-card" onclick="openJobDetail(${j.id})">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <span class="job-type-badge ${getBadgeClass(j.type)}">${j.type || 'Position'}</span>
+                            <span class="${j.status === 'open' ? 'job-status-open' : 'job-status-closed'}">● ${j.status === 'open' ? 'Open' : 'Closed'}</span>
+                        </div>
+                        <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px;">${j.title}</h3>
+                        <p style="color: var(--muted); font-size: 14px;">${j.dept ? '🏢 ' + j.dept : ''} ${j.loc ? '📍 ' + j.loc : ''}</p>
+                    </div>
+                    <div style="flex-shrink: 0; color: var(--accent); font-size: 20px;">→</div>
+                </div>
+            `).join('');
+        }
+
+        function filterJobs(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.job-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filtered = type === 'all' ? allJobs : allJobs.filter(j => j.type === type);
+            renderJobs(filtered);
+        }
+
+        function openJobDetail(id) {
+            const job = allJobs.find(j => j.id === id);
+            if (!job) return;
+            const modal = document.getElementById('jobDetailModal');
+            document.getElementById('jdTitle').textContent = job.title;
+            document.getElementById('jdType').textContent = job.type || 'Position';
+            document.getElementById('jdDept').textContent = job.dept || 'SMPS Tech Lab';
+            document.getElementById('jdLoc').textContent = job.loc || 'Bengaluru, Karnataka';
+            document.getElementById('jdDesc').textContent = job.desc || job.description || 'No description provided.';
+            const reqs = Array.isArray(job.requirements) ? job.requirements : [];
+            document.getElementById('jdReqs').innerHTML = reqs.length
+                ? '<ul style="margin:0;padding-left:20px;color:var(--muted);font-size:14px;line-height:2;">' + reqs.map(r => `<li>${r}</li>`).join('') + '</ul>'
+                : '<p style="color:var(--muted);font-size:14px;">No specific requirements listed.</p>';
+            modal.style.display = 'flex';
+        }
+
+        async function loadJobs() {
+            try {
+                const res = await fetch('/api/jobs?_=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) {
+                        allJobs = data;
+                        renderJobs(data);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to load jobs from backend', e);
+            }
+            // Fallback: localStorage cache
+            try {
+                const cached = localStorage.getItem('smps_sandbox_jobs') || localStorage.getItem('jobs');
+                if (cached) {
+                    allJobs = JSON.parse(cached);
+                    renderJobs(allJobs);
+                    return;
+                }
+            } catch (e) {}
+            document.getElementById('jobsLoading').style.display = 'none';
+            document.getElementById('noJobsMsg').style.display = 'block';
+        }
+
+        loadJobs();
+    </script>
+
+    <!-- Job Detail Modal -->
+    <div id="jobDetailModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; padding:20px;" onclick="if(event.target===this)this.style.display='none'">
+        <div style="background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; max-width: 600px; width: 100%; padding: 36px; position: relative; max-height: 90vh; overflow-y: auto;">
+            <button onclick="document.getElementById('jobDetailModal').style.display='none'" style="position:absolute;top:20px;right:20px;background:var(--glass);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--muted);cursor:pointer;font-size:18px;">✕</button>
+            <div style="margin-bottom: 20px;">
+                <span id="jdType" style="background:rgba(59,130,246,0.1);color:var(--accent);padding:4px 14px;border-radius:100px;font-size:12px;font-weight:600;"></span>
+            </div>
+            <h2 id="jdTitle" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px;"></h2>
+            <p style="color: var(--muted); font-size: 14px; margin-bottom: 24px;">🏢 <span id="jdDept"></span> &nbsp;|&nbsp; 📍 <span id="jdLoc"></span></p>
+            <h4 style="font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">About This Role</h4>
+            <p id="jdDesc" style="color: var(--muted); font-size: 15px; line-height: 1.8; margin-bottom: 24px;"></p>
+            <h4 style="font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Requirements</h4>
+            <div id="jdReqs" style="margin-bottom: 32px;"></div>
+            <a href="contact.html" style="display:block;text-align:center;background:var(--accent);color:#fff;padding:14px 28px;border-radius:12px;font-weight:700;text-decoration:none;font-size:16px;">Apply for This Position →</a>
+        </div>
     </div>
 
     <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">

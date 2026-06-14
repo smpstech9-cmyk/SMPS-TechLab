@@ -1398,6 +1398,11 @@ const Products = (() => {
   async function saveAll(list) {
     // In-memory cache update (actual save is done via API calls in save/remove)
     window._cachedProducts = list;
+    try {
+      await DataStore.saveList('products', list);
+    } catch (e) {
+      console.warn('Failed to sync products to DataStore:', e);
+    }
   }
 
   async function render() {
@@ -1749,6 +1754,14 @@ const Execom = (() => {
 
   async function saveAll(list) {
     window._cachedExecomData = list;
+    try {
+      const execs = list.filter(x => x.type === 'execom');
+      const advs = list.filter(x => x.type === 'advisor');
+      await DataStore.saveList('execomMembers', execs);
+      await DataStore.saveList('advisors', advs);
+    } catch (e) {
+      console.warn('Failed to sync execom to DataStore:', e);
+    }
   }
 
   async function render() {
@@ -1765,7 +1778,7 @@ const Execom = (() => {
       <tr>
         <td>
           <div style="display:flex;align-items:center;gap:10px">
-            ${m.img ? `<img src="../${m.img}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
+            ${m.img ? `<img src="${(m.img.startsWith('http://') || m.img.startsWith('https://') || m.img.startsWith('data:')) ? m.img : '../' + m.img}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
             <div class="initials-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent-dim);display:${m.img ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:var(--accent);">${Utils.sanitize(m.initials || '??')}</div>
             <div>
               <div class="td-title">${Utils.sanitize(m.name)}</div>
@@ -2056,6 +2069,11 @@ const Events = (() => {
 
   async function saveAll(list) {
     window._cachedEventsData = list;
+    try {
+      await DataStore.saveList('eventsData', list);
+    } catch (e) {
+      console.warn('Failed to sync events to DataStore:', e);
+    }
   }
 
   async function render() {
@@ -2072,7 +2090,7 @@ const Events = (() => {
       <tr>
         <td>
           <div style="display:flex;align-items:center;gap:10px">
-            ${e.img ? `<img src="${e.img}" style="width:40px;height:30px;border-radius:4px;object-fit:cover;">` : ''}
+            ${e.img ? `<img src="${(e.img.startsWith('http://') || e.img.startsWith('https://') || e.img.startsWith('data:')) ? e.img : '../' + e.img}" style="width:40px;height:30px;border-radius:4px;object-fit:cover;">` : ''}
             <div>
               <div class="td-title">${Utils.sanitize(e.name)}</div>
               <div class="td-muted">${Utils.sanitize(e.desc?.substring(0, 50) || '')}...</div>
@@ -2375,7 +2393,7 @@ const Gallery = (() => {
     tbody.innerHTML = list.map(g => `
       <tr>
         <td>
-          ${g.img ? `<img src="${g.img}" style="width:50px;height:35px;border-radius:4px;object-fit:cover;">` : ''}
+          ${g.img ? `<img src="${(g.img.startsWith('http://') || g.img.startsWith('https://') || g.img.startsWith('data:')) ? g.img : '../' + g.img}" style="width:50px;height:35px;border-radius:4px;object-fit:cover;">` : ''}
         </td>
         <td>
           <div class="td-title">${Utils.sanitize(g.title)}</div>
@@ -3151,7 +3169,6 @@ const IPSettings = (() => {
     } catch (e) {
       console.warn('Failed to load IP settings from local backend:', e);
     }
-
     try {
       const local = await DataStore.getDocument('ipData', Defaults.ipSettings());
       if (local && Object.keys(local).length) return local;
@@ -3176,17 +3193,13 @@ const IPSettings = (() => {
       try {
         await fetch('/api/ip/settings', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify(d)
         });
       } catch (e) {
         console.warn('Failed to save IP settings to local backend:', e);
       }
     }
-
     await DataStore.saveDocument('ipData', d);
     Toast.show('✅ Hero & Stats saved!', 'success');
   }
@@ -3203,11 +3216,31 @@ const IPSettings = (() => {
    CAREERS / JOBS MODULE
    ════════════════════════════════════════ */
 
+
 const Jobs = (() => {
   const TYPE_COLORS = { 'Full-time': 'pill-blue', 'Internship': 'pill-purple', 'Contract': 'pill-gold', 'Part-time': 'pill-cyan' };
 
-  async function getAll()      { return DataStore.getList('jobs', Defaults.jobs()); }
-  function saveAll(list) { DataStore.saveList('jobs', list); }
+  async function getAll() {
+    try {
+      const res = await fetch('/api/jobs?_=' + Date.now());
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list)) {
+          window._cachedJobsData = list;
+          try { DataStore.saveList('jobs', list); } catch (e) {}
+          return list;
+        }
+      }
+    } catch (e) { console.warn('Backend jobs fetch failed, using cache', e); }
+    if (window._cachedJobsData !== undefined) return window._cachedJobsData;
+    try {
+      const list = await DataStore.getList('jobs', null);
+      if (list !== null) return list;
+    } catch (e) {}
+    return Defaults.jobs();
+  }
+
+  async function saveAll(list) { await DataStore.saveList('jobs', list); }
 
   async function render() {
     const jobs  = await getAll();
@@ -3260,10 +3293,8 @@ const Jobs = (() => {
   async function save() {
     const title = Utils.getVal('jm-title');
     if (!title) { Toast.show('⚠️ Position title is required.', 'error'); return; }
-
     const editId = Utils.getVal('jm-editId');
     const obj = {
-      id:     editId || Utils.uid('J'),
       title,
       type:   Utils.el('jm-type').value,
       dept:   Utils.getVal('jm-dept'),
@@ -3272,11 +3303,39 @@ const Jobs = (() => {
       desc:   Utils.getVal('jm-desc'),
       requirements: Utils.getVal('jm-req').split('\n').map(r => r.trim()).filter(Boolean),
     };
-
-    const jobs = await getAll();
-    const updated = editId ? jobs.map(j => j.id === editId ? obj : j) : [...jobs, obj];
-
-    saveAll(updated);
+    const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+    let savedSuccess = false;
+    if (token) {
+      try {
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        let res;
+        if (editId && String(editId).match(/^\d+$/)) {
+          res = await fetch(`/api/jobs/${editId}`, { method: 'PUT', headers, body: JSON.stringify(obj) });
+        } else {
+          res = await fetch('/api/jobs', { method: 'POST', headers, body: JSON.stringify(obj) });
+        }
+        if (res.ok) {
+          savedSuccess = true;
+          const listRes = await fetch('/api/jobs?_=' + Date.now());
+          if (listRes.ok) {
+            const list = await listRes.json();
+            window._cachedJobsData = list;
+            await saveAll(list);
+          }
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          Toast.show(`⚠️ Error: ${errData.error || 'Failed to save job'}`, 'error');
+          return;
+        }
+      } catch (e) { console.warn('Backend save job failed, saving locally', e); }
+    }
+    if (!savedSuccess) {
+      const jobs = await getAll();
+      const newObj = { ...obj, id: editId || Utils.uid('J') };
+      const updated = editId ? jobs.map(j => String(j.id) === String(editId) ? newObj : j) : [...jobs, newObj];
+      await saveAll(updated);
+      window._cachedJobsData = updated;
+    }
     Modal.close('jobModal');
     render();
     Toast.show('✅ Opening saved!', 'success');
@@ -3285,8 +3344,15 @@ const Jobs = (() => {
   async function remove(id) {
     const yes = await Confirm.ask('Delete this job opening? This cannot be undone.');
     if (!yes) return;
+    const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+    if (token && String(id).match(/^\d+$/)) {
+      try { await fetch(`/api/jobs/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } }); }
+      catch (e) { console.warn('Backend delete job failed', e); }
+    }
     const jobs = await getAll();
-    saveAll(jobs.filter(j => j.id !== id));
+    const updated = jobs.filter(j => String(j.id) !== String(id));
+    await saveAll(updated);
+    window._cachedJobsData = updated;
     render();
     Toast.show('🗑 Opening deleted.');
   }
@@ -4061,13 +4127,36 @@ function setupImageUploaders() {
       if (!file) return;
       btn.textContent = '⏳ Uploading...';
       try {
-        const storageRef = firebase.storage().ref();
-        const fileRef = storageRef.child(`uploads/${Date.now()}_${file.name}`);
-        await fileRef.put(file);
-        const url = await fileRef.getDownloadURL();
-        input.value = url;
-        btn.textContent = '✅ Uploaded';
-        Toast.show('Image uploaded successfully!', 'success');
+        const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const headers = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: headers,
+          body: formData
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) {
+            input.value = data.url;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            btn.textContent = '✅ Uploaded';
+            Toast.show('Image uploaded successfully!', 'success');
+          } else {
+            throw new Error('No URL in response');
+          }
+        } else {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Failed to upload image');
+        }
       } catch (err) {
         console.error('Image upload failed:', err);
         btn.textContent = '❌ Failed';
@@ -4081,59 +4170,15 @@ function setupImageUploaders() {
 }
 
 function setupRealtimeSubscriptions() {
-  // NOTE: Products are managed via SQLite API — no Firebase subscription needed.
-  // The Firebase subscription was overwriting SQLite data with an empty list.
-  // Products.render() is called directly when the products tab is activated.
+  // NOTE: Products, Execom, Events, Gallery, Patents, Research, Licensing, Proposals, and Messages
+  // are all managed via the SQLite API on the Flask backend — no Firebase subscriptions needed.
+  // The Firebase subscriptions were overwriting SQLite data with empty/stale lists.
+  // These modules retrieve their data directly from the SQLite backend API.
 
-  // Execom Members and Advisors are managed via SQLite API — no Firebase subscription needed.
-
-  // Events are managed via SQLite API — no Firebase subscription needed.
-
-  // 5. Gallery
-  subscriptions.galleryData = DataStore.subscribe('galleryData', (list) => {
-    window._cachedGalleryData = list;
-    Gallery.render();
-    setupImageUploaders();
-  }, []);
-
-  // 6. Patents
-  subscriptions.patents = DataStore.subscribe('patents', (list) => {
-    window._cachedPatents = list;
-    IP.render();
-    setupImageUploaders();
-  }, []);
-
-  // 7. Research
-  subscriptions.researchData = DataStore.subscribe('researchData', (list) => {
-    window._cachedResearchData = list;
-    Research.render();
-    setupImageUploaders();
-  }, []);
-
-  // 8. Licensing
-  subscriptions.licensingData = DataStore.subscribe('licensingData', (list) => {
-    window._cachedLicensingData = list;
-    Licensing.render();
-    setupImageUploaders();
-  }, []);
-
-  // 9. Proposals
-  subscriptions.proposals = DataStore.subscribe('proposals', (list) => {
-    window._cachedProposals = list;
-    Proposals.render();
-  }, []);
-
-  // 10. Subscribers
+  // 10. Subscribers (Still managed via DataStore/Firebase)
   subscriptions.subscribers = DataStore.subscribe('subscribers', (list) => {
     window._cachedSubscribers = list;
     Subscribers.render();
-  }, []);
-
-  // 11. Messages
-  subscriptions.contactMessages = DataStore.subscribe('contactMessages', (list) => {
-    window._cachedContactMessages = list;
-    Messages.render();
-    Dashboard.updateMsgBadge();
   }, []);
 }
 
@@ -4143,6 +4188,90 @@ function setupRealtimeSubscriptions() {
 
 const App = {
   _subscribed: false,
+  async preload() {
+    // Preload SQLite data to keep caches and Dashboard stats updated
+    const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+    const apiFetch = async (url, fallbackKey, defaultVal) => {
+      try {
+        const res = await fetch(url + '?_=' + Date.now(), { headers });
+        if (res.ok) {
+          const list = await res.json();
+          if (Array.isArray(list)) {
+            if (list.length === 0) {
+              const cached = await DataStore.getList(fallbackKey, null);
+              if (Array.isArray(cached) && cached.length > 0) {
+                console.log(`[Auto-Sync] Syncing ${fallbackKey} to ${url}...`);
+                for (const item of cached) {
+                  try {
+                    await fetch(url, {
+                      method: 'POST',
+                      headers: { ...headers, 'Content-Type': 'application/json' },
+                      body: JSON.stringify(item)
+                    });
+                  } catch (err) {
+                    console.error(`[Auto-Sync] Failed to sync item to ${url}:`, err);
+                  }
+                }
+                const freshRes = await fetch(url + '?_=' + Date.now(), { headers });
+                if (freshRes.ok) {
+                  const freshList = await freshRes.json();
+                  if (Array.isArray(freshList)) return freshList;
+                }
+                return cached;
+              }
+            }
+            try { await DataStore.saveList(fallbackKey, list); } catch (e) {}
+            return list;
+          }
+        }
+      } catch (e) {
+        console.warn(`Preload failed for ${url}:`, e);
+      }
+      try {
+        const cached = await DataStore.getList(fallbackKey, null);
+        if (cached !== null) return cached;
+      } catch (e) {}
+      return defaultVal;
+    };
+
+    // Parallel fetch all SQLite endpoints
+    const [products, execom, events, gallery, patents, research, licensing, messages, proposals] = await Promise.all([
+      apiFetch('/api/products', 'products', Defaults.products()),
+      apiFetch('/api/execom', 'execomMembers', Defaults.team()),
+      apiFetch('/api/events', 'eventsData', Defaults.events()),
+      apiFetch('/api/gallery', 'galleryData', Defaults.gallery()),
+      apiFetch('/api/patents', 'patents', Defaults.patents()),
+      apiFetch('/api/research', 'researchData', Defaults.research()),
+      apiFetch('/api/licensing', 'licensingData', Defaults.licensing()),
+      apiFetch('/api/messages', 'contactMessages', []),
+      apiFetch('/api/proposals', 'proposals', [])
+    ]);
+
+    window._cachedProducts = products;
+    window._cachedExecomMembers = execom;
+    window._cachedEventsData = events;
+    window._cachedGalleryData = gallery;
+    window._cachedPatents = patents;
+    window._cachedResearchData = research;
+    window._cachedLicensingData = licensing;
+    window._cachedContactMessages = messages;
+    window._cachedProposals = proposals;
+
+    // Additionally sync separated advisors list to local storage
+    if (Array.isArray(execom)) {
+      try {
+        const execs = execom.filter(x => x.type === 'execom');
+        const advs = execom.filter(x => x.type === 'advisor');
+        await DataStore.saveList('execomMembers', execs);
+        await DataStore.saveList('advisors', advs);
+      } catch (e) {}
+    }
+
+    // Refresh dashboard stats once loaded
+    Dashboard.refresh();
+  },
   init() {
     // Initialize all modules
     Dashboard.init();
@@ -4169,10 +4298,16 @@ const App = {
     Subscribers.init();
     Settings.init();
 
+    // Call setupImageUploaders to initialize image upload buttons
+    setupImageUploaders();
+
     if (!this._subscribed) {
       setupRealtimeSubscriptions();
       this._subscribed = true;
     }
+
+    // Preload database collections from SQLite
+    this.preload();
   }
 };
 

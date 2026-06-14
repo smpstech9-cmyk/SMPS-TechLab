@@ -1338,6 +1338,51 @@
 
         window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50));
 
+        // ─── Image Error Resolver Helper ──────────────────────────────────────
+        function handleImageError(imgEl, originalUrl, initials) {
+            // Prevent infinite loop if fallback fails
+            if (imgEl.dataset.fallbackTriggered) {
+                fallbackToInitials();
+                return;
+            }
+            imgEl.dataset.fallbackTriggered = 'true';
+
+            if (originalUrl && originalUrl.startsWith('http')) {
+                // Try resolving via backend proxy
+                fetch('/api/resolve-image?url=' + encodeURIComponent(originalUrl))
+                    .then(res => {
+                        if (res.ok) return res.json();
+                        throw new Error('Failed to resolve');
+                    })
+                    .then(data => {
+                        if (data && data.resolved && data.resolved !== originalUrl) {
+                            imgEl.src = data.resolved;
+                        } else {
+                            fallbackToInitials();
+                        }
+                    })
+                    .catch(() => {
+                        fallbackToInitials();
+                    });
+            } else {
+                fallbackToInitials();
+            }
+
+            function fallbackToInitials() {
+                const parent = imgEl.parentNode;
+                if (parent) {
+                    const avatarDiv = document.createElement('div');
+                    avatarDiv.className = imgEl.className;
+                    // Apply any inline style if present
+                    if (imgEl.style.cssText) {
+                        avatarDiv.style.cssText = imgEl.style.cssText;
+                    }
+                    avatarDiv.textContent = initials || 'Avatar';
+                    parent.replaceChild(avatarDiv, imgEl);
+                }
+            }
+        }
+
         const obs = new IntersectionObserver(e => e.forEach(el => {
             if (el.isIntersecting) {
                 el.target.classList.add('visible');
@@ -1461,7 +1506,7 @@
         function renderExecom() {
             document.getElementById('execomGrid').innerHTML = execomMembers.map(m => `
       <div class="execom-card reveal" onclick="openMemberModal('${m.id}','execom')">
-        ${m.img ? '<img src="' + m.img + '" class="execom-avatar">' : '<div class="execom-avatar">' + m.initials + '</div>'}
+        ${m.img ? `<img src="${m.img}" class="execom-avatar" onerror="handleImageError(this, '${m.img}', '${m.initials}')">` : '<div class="execom-avatar">' + m.initials + '</div>'}
         <h3>${m.name}</h3>
         <div class="execom-role">${m.role}</div>
         <div class="execom-expertise">${m.expertise}</div>
@@ -1473,7 +1518,7 @@
         function renderAdvisors() {
             document.getElementById('advisorGrid').innerHTML = advisors.map(a => `
       <div class="execom-card reveal" onclick="openMemberModal('${a.id}','advisor')">
-        <div class="execom-avatar">${a.initials}</div>
+        ${a.img ? `<img src="${a.img}" class="execom-avatar" onerror="handleImageError(this, '${a.img}', '${a.initials}')">` : '<div class="execom-avatar">' + a.initials + '</div>'}
         <h3>${a.name}</h3>
         <div class="execom-role">${a.role}</div>
         <div class="execom-expertise">${a.expertise}</div>
@@ -1507,7 +1552,7 @@
             document.getElementById('modalBody').innerHTML = `
                 <div class="modal-content-grid">
                     <div class="modal-left">
-                        ${member.img ? '<img src="' + member.img + '" class="modal-left-avatar" style="object-fit: cover;">' : '<div class="modal-left-avatar">' + member.initials + '</div>'}
+                        ${member.img ? `<img src="${member.img}" class="modal-left-avatar" style="object-fit: cover;" onerror="handleImageError(this, '${member.img}', '${member.initials}')">` : '<div class="modal-left-avatar">' + member.initials + '</div>'}
                         <h2>${member.name}</h2>
                         <div class="modal-left-role">${member.role}</div>
                         ${member.email ? `

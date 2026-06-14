@@ -262,6 +262,28 @@ def init_db():
         )
     ''')
 
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS jobs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            type TEXT,
+            dept TEXT,
+            loc TEXT,
+            status TEXT DEFAULT 'open',
+            description TEXT,
+            requirements TEXT,
+            posted_date TEXT
+        )
+    ''')
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE,
+            subscribed_date TEXT
+        )
+    ''')
+
 
 
     # Default admin user (password: smps2026)
@@ -298,6 +320,34 @@ def token_required(f):
             
         return f(current_user, *args, **kwargs)
     return decorated
+
+# --- File Upload Route ---
+@app.route('/api/upload', methods=['POST'])
+@token_required
+def upload_file(current_user):
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    # Check if the file is allowed
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
+    ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
+    if ext not in allowed_extensions:
+        return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(allowed_extensions)}'}), 400
+
+    # Create uploads directory inside assets
+    uploads_dir = os.path.join(BASE_DIR, 'assets', 'uploads')
+    if not os.path.exists(uploads_dir):
+        os.makedirs(uploads_dir)
+
+    import uuid
+    safe_filename = f"{uuid.uuid4().hex}.{ext}"
+    filepath = os.path.join(uploads_dir, safe_filename)
+    file.save(filepath)
+    url = f"/assets/uploads/{safe_filename}"
+    return jsonify({'success': True, 'url': url})
 
 # --- Auth Routes ---
 @app.route('/api/auth/login', methods=['POST'])
@@ -456,6 +506,60 @@ def clear_all_proposals(current_user):
     conn.close()
     return jsonify({'success': True})
 
+# --- Products Helpers & Image Resolver ---
+def resolve_og_image(url):
+    if not url or not url.startswith(('http://', 'https://')):
+        return url
+    
+    # If it already looks like a direct image URL, return it
+    lower_url = url.lower()
+    if any(lower_url.endswith(ext) for ext in ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg']):
+        return url
+        
+    try:
+        import urllib.request
+        import ssl
+        import re
+        
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+        )
+        with urllib.request.urlopen(req, timeout=3, context=ctx) as response:
+            content_type = response.headers.get('Content-Type', '')
+            if 'text/html' not in content_type:
+                return url
+            
+            html = response.read().decode('utf-8', errors='ignore')
+            
+            # Match og:image or twitter:image
+            match = re.search(r'<meta\s+property=["\']og:image["\']\s+content=["\']([^"\']+)["\']', html)
+            if not match:
+                match = re.search(r'<meta\s+content=["\']([^"\']+)["\']\s+property=["\']og:image["\']', html)
+            if not match:
+                match = re.search(r'<meta\s+name=["\']twitter:image["\']\s+content=["\']([^"\']+)["\']', html)
+            if not match:
+                match = re.search(r'<meta\s+content=["\']([^"\']+)["\']\s+name=["\']twitter:image["\']', html)
+                
+            if match:
+                resolved_url = match.group(1)
+                # Ensure resolved url is absolute
+                if resolved_url.startswith('//'):
+                    resolved_url = 'https:' + resolved_url
+                elif resolved_url.startswith('/'):
+                    from urllib.parse import urljoin
+                    resolved_url = urljoin(url, resolved_url)
+                print(f"[Resolve Image] Resolved {url} -> {resolved_url}")
+                return resolved_url
+    except Exception as e:
+        print(f"[Resolve Image] Error resolving {url}: {e}")
+        
+    return url
+
 # --- Products Routes ---
 @app.route('/api/products', methods=['GET'])
 def get_products():
@@ -478,6 +582,9 @@ def get_products():
 @token_required
 def create_product(current_user):
     data = request.get_json(silent=True) or {}
+    img_url = data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
     conn = get_db_connection()
     c = conn.cursor()
     c.execute('''
@@ -485,7 +592,7 @@ def create_product(current_user):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('name'), data.get('tag'), data.get('status'), data.get('icon'),
-        data.get('img'), data.get('imgClass'), data.get('tagClass'), data.get('tagLabel'), 
+        resolved_img, data.get('imgClass'), data.get('tagClass'), data.get('tagLabel'), 
         data.get('desc'), data.get('fullDesc'), json.dumps(data.get('features', []))
     ))
     conn.commit()
@@ -497,6 +604,9 @@ def create_product(current_user):
 @token_required
 def update_product(current_user, id):
     data = request.get_json(silent=True) or {}
+    img_url = data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
     conn = get_db_connection()
     conn.execute('''
         UPDATE products SET 
@@ -505,7 +615,7 @@ def update_product(current_user, id):
         WHERE id = ?
     ''', (
         data.get('name'), data.get('tag'), data.get('status'), data.get('icon'),
-        data.get('img'), data.get('imgClass'), data.get('tagClass'), data.get('tagLabel'), 
+        resolved_img, data.get('imgClass'), data.get('tagClass'), data.get('tagLabel'), 
         data.get('desc'), data.get('fullDesc'), json.dumps(data.get('features', [])), id
     ))
     conn.commit()
@@ -520,6 +630,15 @@ def delete_product(current_user, id):
     conn.commit()
     conn.close()
     return jsonify({'success': True})
+
+@app.route('/api/resolve-image', methods=['GET'])
+def resolve_image_endpoint():
+    url = request.args.get('url')
+    if not url:
+        return jsonify({'error': 'Missing url parameter'}), 400
+    resolved = resolve_og_image(url)
+    return jsonify({'resolved': resolved})
+
 
 # --- Execom Routes ---
 @app.route('/api/execom', methods=['GET'])
@@ -542,6 +661,9 @@ def get_execom():
 @token_required
 def create_execom(current_user):
     data = request.get_json(silent=True) or {}
+    img_url = data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
     conn = get_db_connection()
     c = conn.cursor()
     c.execute('''
@@ -549,7 +671,7 @@ def create_execom(current_user):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('name'), data.get('role'), data.get('type'), data.get('initials'),
-        data.get('img'), data.get('expertise'), data.get('bio'), data.get('quote'),
+        resolved_img, data.get('expertise'), data.get('bio'), data.get('quote'),
         json.dumps(data.get('achievements', [])), data.get('linkedin'), data.get('email')
     ))
     conn.commit()
@@ -561,6 +683,9 @@ def create_execom(current_user):
 @token_required
 def update_execom(current_user, id):
     data = request.get_json(silent=True) or {}
+    img_url = data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
     conn = get_db_connection()
     conn.execute('''
         UPDATE execom SET 
@@ -569,7 +694,7 @@ def update_execom(current_user, id):
         WHERE id = ?
     ''', (
         data.get('name'), data.get('role'), data.get('type'), data.get('initials'),
-        data.get('img'), data.get('expertise'), data.get('bio'), data.get('quote'),
+        resolved_img, data.get('expertise'), data.get('bio'), data.get('quote'),
         json.dumps(data.get('achievements', [])), data.get('linkedin'), data.get('email'), id
     ))
     conn.commit()
@@ -606,6 +731,9 @@ def get_events():
 @token_required
 def create_event(current_user):
     data = request.get_json(silent=True) or {}
+    img_url = data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
     conn = get_db_connection()
     c = conn.cursor()
     is_featured = 1 if data.get('is_featured') else 0
@@ -616,7 +744,7 @@ def create_event(current_user):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('name'), data.get('type'), data.get('date'), data.get('month'),
-        data.get('day'), data.get('location'), data.get('img'), data.get('desc'),
+        data.get('day'), data.get('location'), resolved_img, data.get('desc'),
         data.get('fullDesc'), json.dumps(data.get('speakers', [])), data.get('agenda'),
         data.get('prerequisites'), data.get('seats'), is_featured
     ))
@@ -629,6 +757,9 @@ def create_event(current_user):
 @token_required
 def update_event(current_user, id):
     data = request.get_json(silent=True) or {}
+    img_url = data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
     conn = get_db_connection()
     is_featured = 1 if data.get('is_featured') else 0
     if is_featured == 1:
@@ -640,7 +771,7 @@ def update_event(current_user, id):
         WHERE id = ?
     ''', (
         data.get('name'), data.get('type'), data.get('date'), data.get('month'),
-        data.get('day'), data.get('location'), data.get('img'), data.get('desc'),
+        data.get('day'), data.get('location'), resolved_img, data.get('desc'),
         data.get('fullDesc'), json.dumps(data.get('speakers', [])), data.get('agenda'),
         data.get('prerequisites'), data.get('seats'), is_featured, id
     ))
@@ -669,13 +800,16 @@ def get_gallery():
 @token_required
 def create_gallery(current_user):
     data = request.get_json(silent=True) or {}
+    img_url = data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
     conn = get_db_connection()
     c = conn.cursor()
     c.execute('''
         INSERT INTO gallery (category, title, desc, img)
         VALUES (?, ?, ?, ?)
     ''', (
-        data.get('category'), data.get('title'), data.get('desc'), data.get('img')
+        data.get('category'), data.get('title'), data.get('desc'), resolved_img
     ))
     conn.commit()
     gallery_id = c.lastrowid
@@ -686,13 +820,16 @@ def create_gallery(current_user):
 @token_required
 def update_gallery(current_user, id):
     data = request.get_json(silent=True) or {}
+    img_url = data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
     conn = get_db_connection()
     conn.execute('''
         UPDATE gallery SET 
             category = ?, title = ?, desc = ?, img = ?
         WHERE id = ?
     ''', (
-        data.get('category'), data.get('title'), data.get('desc'), data.get('img'), id
+        data.get('category'), data.get('title'), data.get('desc'), resolved_img, id
     ))
     conn.commit()
     conn.close()
@@ -923,11 +1060,127 @@ def save_site_settings(current_user, key):
     conn.close()
     return jsonify({'success': True})
 
+# --- Jobs / Careers Routes ---
+@app.route('/api/jobs', methods=['GET'])
+def get_jobs():
+    conn = get_db_connection()
+    jobs = conn.execute('SELECT * FROM jobs ORDER BY id DESC').fetchall()
+    conn.close()
+    result = []
+    for j in jobs:
+        d = dict(j)
+        try:
+            d['requirements'] = json.loads(d['requirements']) if d['requirements'] else []
+        except:
+            d['requirements'] = []
+        result.append(d)
+    return jsonify(result)
+
+@app.route('/api/jobs', methods=['POST'])
+@token_required
+def create_job(current_user):
+    data = request.get_json(silent=True) or {}
+    reqs = data.get('requirements', [])
+    if isinstance(reqs, list):
+        reqs = json.dumps(reqs)
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO jobs (title, type, dept, loc, status, description, requirements, posted_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        data.get('title'), data.get('type', 'Full-time'),
+        data.get('dept'), data.get('loc'),
+        data.get('status', 'open'),
+        data.get('desc') or data.get('description'),
+        reqs,
+        datetime.datetime.utcnow().strftime('%Y-%m-%d')
+    ))
+    conn.commit()
+    job_id = c.lastrowid
+    conn.close()
+    return jsonify({'success': True, 'id': job_id}), 201
+
+@app.route('/api/jobs/<int:id>', methods=['PUT'])
+@token_required
+def update_job(current_user, id):
+    data = request.get_json(silent=True) or {}
+    reqs = data.get('requirements', [])
+    if isinstance(reqs, list):
+        reqs = json.dumps(reqs)
+    conn = get_db_connection()
+    conn.execute('''
+        UPDATE jobs SET title=?, type=?, dept=?, loc=?, status=?, description=?, requirements=?
+        WHERE id=?
+    ''', (
+        data.get('title'), data.get('type', 'Full-time'),
+        data.get('dept'), data.get('loc'),
+        data.get('status', 'open'),
+        data.get('desc') or data.get('description'),
+        reqs, id
+    ))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+@app.route('/api/jobs/<int:id>', methods=['DELETE'])
+@token_required
+def delete_job(current_user, id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM jobs WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+# --- Newsletter Subscriber Routes ---
+@app.route('/api/newsletter-subscribe', methods=['POST'])
+def newsletter_subscribe():
+    data = request.get_json(silent=True) or {}
+    email = data.get('email', '').strip().lower()
+    if not email or '@' not in email:
+        return jsonify({'error': 'Valid email required'}), 400
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            'INSERT OR IGNORE INTO newsletter_subscribers (email, subscribed_date) VALUES (?, ?)',
+            (email, datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+        )
+        conn.commit()
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': str(e)}), 500
+    conn.close()
+    return jsonify({'success': True})
+
+@app.route('/api/newsletter-subscribers', methods=['GET'])
+@token_required
+def get_newsletter_subscribers(current_user):
+    conn = get_db_connection()
+    subs = conn.execute('SELECT * FROM newsletter_subscribers ORDER BY id DESC').fetchall()
+    conn.close()
+    return jsonify([dict(s) for s in subs])
+
+@app.route('/api/newsletter-subscribers/<int:id>', methods=['DELETE'])
+@token_required
+def delete_newsletter_subscriber(current_user, id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM newsletter_subscribers WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+@app.route('/api/newsletter-subscribers', methods=['DELETE'])
+@token_required
+def clear_all_subscribers(current_user):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM newsletter_subscribers')
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
     import os
-    port = int(os.getenv('PORT', '5500'))  # Default to 5500 — same port the browser already uses
+    port = int(os.getenv('PORT', '5002'))
     print(f"Starting SMPS Tech Lab Backend on http://127.0.0.1:{port}")
-    print(f"Open: http://127.0.0.1:{port}/index.html")
-    app.run(debug=True, port=port)
-
+    app.run(host='127.0.0.1', port=port, debug=True)
 

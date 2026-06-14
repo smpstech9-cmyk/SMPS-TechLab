@@ -35,7 +35,7 @@ def seed_db():
     # 2. Execom & Advisors
     print("Seeding execom & advisors...")
     c.execute("DELETE FROM execom")
-    members = []
+    members = data.get('defaultExecomMembers', [])
     for m in members:
         c.execute('''
             INSERT INTO execom (id, name, role, type, initials, img, expertise, bio, quote, achievements, linkedin, email)
@@ -46,7 +46,7 @@ def seed_db():
             json.dumps(m.get('achievements', [])), m.get('linkedin'), m.get('email')
         ))
 
-    advisors = []
+    advisors = data.get('defaultAdvisors', [])
     for a in advisors:
         c.execute('''
             INSERT INTO execom (id, name, role, type, initials, img, expertise, bio, quote, achievements, linkedin, email)
@@ -61,7 +61,7 @@ def seed_db():
     # 3. Events
     print("Seeding events...")
     c.execute("DELETE FROM events")
-    events = []
+    events = data.get('defaultEventsData', [])
     for e in events:
         c.execute('''
             INSERT INTO events (id, name, type, date, month, day, location, img, desc, fullDesc, speakers, agenda, prerequisites, seats, is_featured)

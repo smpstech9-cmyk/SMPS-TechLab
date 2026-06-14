@@ -1124,11 +1124,7 @@
     
 
     <script>
-        // Gallery Data
-        // Clear stale local storage cache for gallery
-        localStorage.removeItem('smps_sandbox_galleryData');
-        localStorage.removeItem('galleryData');
-
+        // Gallery Data — do NOT clear localStorage here, admin panel writes data to it
         const defaultGalleryData = [];
 
         // Gallery Page Settings Connection
@@ -1193,21 +1189,46 @@
         let currentIndex = 0;
 
         async function loadGallery() {
+            // 1. Try the backend API first (always fresh)
             try {
                 const res = await fetch('/api/gallery?_=' + Date.now());
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data)) {
+                    if (Array.isArray(data) && data.length > 0) {
                         galleryData = data;
+                        // Cache result in localStorage for offline fallback
+                        try {
+                            localStorage.setItem('smps_sandbox_galleryData', JSON.stringify(data));
+                            localStorage.setItem('galleryData', JSON.stringify(data));
+                        } catch (e) {}
+                        filteredItems = [...galleryData];
+                        renderGallery();
+                        return;
+                    } else if (Array.isArray(data) && data.length === 0) {
+                        // API returned empty — check DataStore for locally-saved items
+                        // (Admin may have saved items offline or the DB might be empty)
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to fetch gallery from backend API, trying local cache...', error);
+            }
+
+            // 2. Fallback: Try DataStore (localStorage cache written by admin panel)
+            if (window.DataStore && typeof DataStore.getList === 'function') {
+                try {
+                    const cached = await DataStore.getList('galleryData', null);
+                    if (Array.isArray(cached) && cached.length > 0) {
+                        galleryData = cached;
                         filteredItems = [...galleryData];
                         renderGallery();
                         return;
                     }
+                } catch (e) {
+                    console.warn('DataStore fallback for gallery also failed', e);
                 }
-            } catch (error) {
-                console.warn('Failed to fetch gallery from backend API', error);
             }
 
+            // 3. Nothing found — render empty state
             galleryData = [];
             filteredItems = [];
             renderGallery();
@@ -1452,9 +1473,11 @@
 
         window.addEventListener('storage', (e) => {
             if (!e) return;
-            if (e.key === 'galleryData') {
+            // Reload gallery items when admin saves from the admin panel
+            if (e.key === 'galleryData' || e.key === 'smps_sandbox_galleryData') {
                 loadGallery();
             }
+            // Reload gallery settings (hero text, categories)
             if (e.key === 'gallerySettings' || e.key === 'smps_sandbox_gallerySettings') {
                 try { loadGallerySettings(); } catch (err) { console.warn('Failed to reload gallery settings after storage update', err); }
             }

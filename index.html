@@ -3624,6 +3624,36 @@
                 return [];
             }
 
+            function handleImageError(imgEl, originalUrl) {
+                const defaultImg = 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800';
+                
+                if (imgEl.dataset.fallbackTriggered) {
+                    imgEl.src = defaultImg;
+                    return;
+                }
+                imgEl.dataset.fallbackTriggered = 'true';
+
+                if (originalUrl && originalUrl.startsWith('http')) {
+                    fetch('/api/resolve-image?url=' + encodeURIComponent(originalUrl))
+                        .then(res => {
+                            if (res.ok) return res.json();
+                            throw new Error('Failed to resolve');
+                        })
+                        .then(data => {
+                            if (data && data.resolved && data.resolved !== originalUrl) {
+                                imgEl.src = data.resolved;
+                            } else {
+                                imgEl.src = defaultImg;
+                            }
+                        })
+                        .catch(() => {
+                            imgEl.src = defaultImg;
+                        });
+                } else {
+                    imgEl.src = defaultImg;
+                }
+            }
+
             async function renderHomeProducts() {
                 const products = await getHomeProducts();
                 const section = document.querySelector('.products-section');
@@ -3643,7 +3673,7 @@
                 grid.innerHTML = featured.map((p, i) => `
                     <div class="product-card reveal" onclick="window.location.href='products.html'" style="animation-delay:${i * .1}s">
                         <div class="product-img">
-                            <img src="${p.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'}" alt="${p.name}">
+                            <img src="${p.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'}" alt="${p.name}" onerror="handleImageError(this, '${p.img}')">
                             <span class="product-tag ${p.tagClass || 'tag-blue'}">${(p.tagLabel || p.tag || 'HARDWARE').toUpperCase()}</span>
                         </div>
                         <div class="product-body">

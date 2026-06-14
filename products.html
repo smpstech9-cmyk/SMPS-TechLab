@@ -1252,33 +1252,80 @@
         const obs = new IntersectionObserver(e => e.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); }), { threshold: .1 });
         document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
+        // ─── Image Error Resolver Helper ──────────────────────────────────────
+        function handleImageError(imgEl, originalUrl) {
+            const defaultImg = 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800';
+            
+            // Prevent infinite loop if fallback fails
+            if (imgEl.dataset.fallbackTriggered) {
+                imgEl.src = defaultImg;
+                return;
+            }
+            imgEl.dataset.fallbackTriggered = 'true';
+
+            if (originalUrl && originalUrl.startsWith('http')) {
+                // Try resolving via backend proxy
+                fetch('/api/resolve-image?url=' + encodeURIComponent(originalUrl))
+                    .then(res => {
+                        if (res.ok) return res.json();
+                        throw new Error('Failed to resolve');
+                    })
+                    .then(data => {
+                        if (data && data.resolved && data.resolved !== originalUrl) {
+                            imgEl.src = data.resolved;
+                        } else {
+                            imgEl.src = defaultImg;
+                        }
+                    })
+                    .catch(() => {
+                        imgEl.src = defaultImg;
+                    });
+            } else {
+                imgEl.src = defaultImg;
+            }
+        }
+
         // ─── Load page settings from admin (hero title, category labels) ─────
         async function loadProductsSettings() {
+            let d = null;
             try {
                 const res = await fetch('/api/settings/productsSettings');
-                if (!res.ok) return;
-                const d = await res.json();
-                if (!d || !Object.keys(d).length) return;
-
-                // Hero title
-                const heroEl = document.getElementById('prodHeroTitle');
-                if (heroEl && d.heroTitle) {
-                    heroEl.innerHTML = d.heroTitle;
+                if (res.ok) {
+                    d = await res.json();
                 }
-                // Category filter button labels
-                const catMap = {
-                    btnCatAll:        d.catAll,
-                    btnCatHardware:   d.catHardware,
-                    btnCatAiSoftware: d.catAiSoftware,
-                    btnCatIot:        d.catIot
-                };
-                Object.entries(catMap).forEach(([id, label]) => {
-                    const btn = document.getElementById(id);
-                    if (btn && label) btn.textContent = label;
-                });
             } catch (e) {
-                console.warn('Could not load products page settings from admin:', e);
+                console.warn('Could not load products page settings from admin API:', e);
             }
+
+            // Fallback to DataStore/localStorage if API failed or returned empty
+            if (!d || !Object.keys(d).length) {
+                if (window.DataStore && typeof DataStore.getDocument === 'function') {
+                    try {
+                        d = await DataStore.getDocument('productsSettings', null);
+                    } catch (err) {
+                        console.warn('Could not load products settings from DataStore:', err);
+                    }
+                }
+            }
+
+            if (!d || !Object.keys(d).length) return;
+
+            // Hero title
+            const heroEl = document.getElementById('prodHeroTitle');
+            if (heroEl && d.heroTitle) {
+                heroEl.innerHTML = d.heroTitle;
+            }
+            // Category filter button labels
+            const catMap = {
+                btnCatAll:        d.catAll,
+                btnCatHardware:   d.catHardware,
+                btnCatAiSoftware: d.catAiSoftware,
+                btnCatIot:        d.catIot
+            };
+            Object.entries(catMap).forEach(([id, label]) => {
+                const btn = document.getElementById(id);
+                if (btn && label) btn.textContent = label;
+            });
         }
 
         // ─── Fetch products from SQLite backend ──────────────────────────────
@@ -1287,13 +1334,26 @@
                 const res = await fetch('/api/products?_=' + Date.now());
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data)) return data;
+                    if (Array.isArray(data) && data.length > 0) return data;
                 }
             } catch (e) {
                 console.warn('Could not fetch products from backend API:', e);
             }
+
+            // Fallback to DataStore/localStorage if API failed or returned empty
+            if (window.DataStore && typeof DataStore.getList === 'function') {
+                try {
+                    const local = await DataStore.getList('products', null);
+                    if (Array.isArray(local) && local.length > 0) {
+                        return local;
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch products from DataStore:', e);
+                }
+            }
             return [];
         }
+
 
         let currentFilter = 'all';
         let currentSearch = '';
@@ -1329,7 +1389,7 @@
                         <div class="product-img">
                             <img src="${p.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'}"
                                  alt="${p.name}"
-                                 onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'">
+                                 onerror="handleImageError(this, '${p.img}')">
                             <span class="product-tag ${p.tagClass || 'tag-blue'}">${p.tagLabel || (p.tag || 'Product').toUpperCase()}</span>
                         </div>
                         <div class="product-body">
@@ -1397,7 +1457,7 @@
                     <img src="${p.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'}"
                          alt="${p.name}"
                          style="width:100%;border-radius:16px;margin-bottom:24px;max-height:280px;object-fit:cover;"
-                         onerror="this.style.display='none'">
+                         onerror="handleImageError(this, '${p.img}')">
                 </div>
                 <div class="modal-section">
                     <h4>Overview</h4>
@@ -1476,6 +1536,16 @@
             renderProducts();
             loadProductsSettings();
         }
+
+        window.addEventListener('storage', (e) => {
+            if (!e) return;
+            if (e.key === 'products' || e.key === 'smps_sandbox_products') {
+                renderProducts();
+            }
+            if (e.key === 'productsSettings' || e.key === 'smps_sandbox_productsSettings') {
+                try { loadProductsSettings(); } catch (err) { console.warn('Failed to reload products settings after storage update', err); }
+            }
+        });
     </script>
     <!-- Floating WhatsApp Widget -->
     <a href="https://wa.me/919035874229" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp">

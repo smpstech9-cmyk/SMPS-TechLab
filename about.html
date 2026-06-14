@@ -520,14 +520,21 @@
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 28px;
+            padding: 24px;
             text-align: center;
             transition: all .3s;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
         }
 
         .team-card:hover {
             border-color: rgba(37, 99, 235, .3);
             transform: translateY(-4px);
+            box-shadow: var(--shadow);
         }
 
         .avatar {
@@ -542,6 +549,7 @@
             font-size: 24px;
             font-weight: 800;
             margin: 0 auto 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .team-card h3 {
@@ -549,18 +557,25 @@
             font-size: 16px;
             font-weight: 700;
             margin-bottom: 6px;
+            line-height: 1.2;
         }
 
         .team-card .role {
             font-size: 13px;
             color: var(--accent2);
-            margin-bottom: 10px;
+            margin-bottom: 0;
+            line-height: 1.3;
         }
 
         .team-card p {
-            font-size: 13px;
-            color: var(--muted);
-            line-height: 1.5;
+            display: none;
+        }
+
+        .modal-left h2 {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            width: 100%;
+            text-align: center;
         }
 
         /* ACHIEVEMENTS */
@@ -1155,25 +1170,25 @@
                 <h2 class="section-title" id="aboutTeamTitle">The Minds Behind <span>The Mission</span></h2>
             </div>
             <div class="team-grid" id="teamGrid">
-                <div class="team-card reveal">
+                <div class="team-card reveal" onclick="openAboutMemberModal(0)">
                     <div class="avatar">SK</div>
                     <h3>Suresh Kumar</h3>
                     <div class="role">Founder & CEO</div>
                     <p>Visionary leader with 20+ years in power electronics and technology entrepreneurship.</p>
                 </div>
-                <div class="team-card reveal">
+                <div class="team-card reveal" onclick="openAboutMemberModal(1)">
                     <div class="avatar">PR</div>
                     <h3>Dr. Priya Rao</h3>
                     <div class="role">Chief Research Officer</div>
                     <p>PhD from IIT Bombay. Leads our R&D division with expertise in AI and energy systems.</p>
                 </div>
-                <div class="team-card reveal">
+                <div class="team-card reveal" onclick="openAboutMemberModal(2)">
                     <div class="avatar">AM</div>
                     <h3>Arjun Mehta</h3>
                     <div class="role">VP, Partnerships</div>
                     <p>Former NASSCOM executive. Drives our academic and industry partnership strategy.</p>
                 </div>
-                <div class="team-card reveal">
+                <div class="team-card reveal" onclick="openAboutMemberModal(3)">
                     <div class="avatar">NV</div>
                     <h3>Nisha Verma</h3>
                     <div class="role">Head of Products</div>
@@ -1348,6 +1363,8 @@
             ]
         };
 
+        window.aboutTeamData = defaultAboutData.team;
+
         function safeParseLocalAbout() {
             return {};
         }
@@ -1360,14 +1377,16 @@
                 return;
             }
 
-            container.innerHTML = team.map(member => {
+            window.aboutTeamData = team;
+
+            container.innerHTML = team.map((member, index) => {
                 const initials = String(member.initials || '').trim().slice(0, 3).toUpperCase();
                 const name = String(member.name || '').trim();
                 const role = String(member.role || '').trim();
                 const bio = String(member.bio || '').trim();
 
                 return `
-                    <div class="team-card reveal">
+                    <div class="team-card reveal" onclick="openAboutMemberModal(${index})">
                         <div class="avatar">${initials || 'TE'}</div>
                         <h3>${name || 'Team Member'}</h3>
                         <div class="role">${role || 'Team Role'}</div>
@@ -1493,6 +1512,55 @@
             }
         }
 
+        function openAboutMemberModal(index) {
+            const member = window.aboutTeamData ? window.aboutTeamData[index] : null;
+            if (!member) return;
+
+            // Hide main modal title as per execom.html
+            document.getElementById('modalTitle').style.display = 'none';
+
+            const initials = String(member.initials || '').trim().slice(0, 3).toUpperCase();
+            const name = String(member.name || '').trim();
+            const role = String(member.role || '').trim();
+            const bio = String(member.bio || '').trim();
+
+            const defaultTagsMap = {
+                'SK': ['Power Electronics', 'Strategy'],
+                'PR': ['AI R&D', 'Energy Systems'],
+                'AM': ['Partnerships', 'Govt Relations'],
+                'NV': ['IoT', 'Product Launch']
+            };
+            const tags = member.tags || defaultTagsMap[initials] || ['Deeptech', 'Engineering'];
+            const expertiseTags = tags.map(tag => `<span class="modal-tag">${tag.trim()}</span>`).join('');
+
+            document.getElementById('modalBody').innerHTML = `
+                <div class="modal-content-grid">
+                    <div class="modal-left">
+                        <div class="modal-left-avatar">${initials || 'TE'}</div>
+                        <h2>${name || 'Team Member'}</h2>
+                        <div class="modal-left-role">${role || 'Team Role'}</div>
+                    </div>
+                    <div class="modal-right">
+                        <div>
+                            <h4 class="modal-section-title">Areas of Expertise</h4>
+                            <div class="modal-tags">
+                                ${expertiseTags}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="modal-section-title">Professional Biography/Message</h4>
+                            <p class="modal-bio-text">${bio || 'No biography details provided.'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalBtn(); }
+        function closeModalBtn() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+
         window.addEventListener('DOMContentLoaded', loadAboutData);
         if (document.readyState !== 'loading') {
             loadAboutData();
@@ -1503,6 +1571,14 @@
             }
         });
     </script>
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2><button class="modal-close" onclick="closeModalBtn()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
     <!-- Floating WhatsApp Widget -->
     <a href="https://wa.me/919035874229" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp">
         <div class="whatsapp-icon">
