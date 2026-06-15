@@ -3126,11 +3126,11 @@
                         homeData = data;
                     }
                 }
-            } catch (e) { }
+            } catch (e) {}
             if (!homeData) {
                 try {
                     homeData = await DataStore.getDocument('homeData', {});
-                } catch (e) { }
+                } catch(e) {}
             }
             if (homeData) {
                 if (homeData.heroTitle) { document.querySelector('.hero h1').innerHTML = homeData.heroTitle; }
@@ -3141,49 +3141,23 @@
 
         // DYNAMIC LOGO RENDERING
         const clients = [
-            'cl 1.png',
-            'cl 2.png',
-            'cl 3.png',
-            'cl 4 (2).png',
-            'cl 5 (3).png',
-            'cl 6(4).png',
-            'cl 7.png',
-            'cl 8.png',
-            'cl 9.png',
-            'cl 10.png',
-            'cl 11.png',
-            'cl 12.png',
-            'cl 13.png',
-            'cl 14.png',
-            'cl 15.png',
-            'cl 16.png',
-            'cl 17.png',
-            'cl 18.png',
-            'cl 19.png'
-        ].map(n => `./assets/LOGOS/clinets/${n}`);
+            'cl 1.png', 'cl 2.png', 'cl 3.png', 'cl 4 (2).png', 'cl 5 (3).png', 'cl 6(4).png',
+            'cl 7.png', 'cl 8.png', 'cl 9.png', 'cl 10.png', 'cl 11.png', 'cl 12.png',
+            'cl 13.png', 'cl 14.png', 'cl 15.png', 'cl 16.png', 'cl 17.png', 'cl 18.png', 'cl 19.png'
+        ].map(n => `assets/logos/clinets/${n}`);
 
         const partners = [
-            'pt1.png',
-            'pt2.png',
-            'pt3.png',
-            'pt4.png',
-            'pt5.png'
-        ].map(n => `./assets/LOGOS/partners/${n}`);
+            'pt1.png', 'pt2.png', 'pt3.png', 'pt4.png', 'pt5.png'
+        ].map(n => `assets/logos/partners/${n}`);
 
         const awards = [
-            'aw 1.png',
-            'aw 2.png'
-        ].map(n => `./assets/LOGOS/aw/${n}`);
+            'aw 1.png', 'aw 2.png'
+        ].map(n => `assets/logos/aw/${n}`);
 
         const mainLogos = [
-            'main 1.png',
-            'main 2.png',
-            'main 3.png',
-            'main 4.png',
-            'main 5.png',
-            'main 6.png',
-            'main 7.png'
-        ].map(n => `./assets/LOGOS/main/${n}`);
+            'main 1.png', 'main 2.png', 'main 3.png', 'main 4.png', 'main 5.png', 'main 6.png', 'main 7.png'
+        ].map(n => `assets/logos/main/${n}`);
+
         function renderLogos(containerId, list, type) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -3652,7 +3626,7 @@
 
             function handleImageError(imgEl, originalUrl) {
                 const defaultImg = 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800';
-
+                
                 if (imgEl.dataset.fallbackTriggered) {
                     imgEl.src = defaultImg;
                     return;
