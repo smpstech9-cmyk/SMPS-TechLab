@@ -1037,6 +1037,552 @@
         }
     </style>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* ==========================================
+           IP PORTFOLIO PREMIUM RESPONSIVENESS OVERRIDES
+           ========================================== */
+        
+        /* 1. Reset / Base Fluid Spacing & Typography */
+        :root {
+            --glass-glow: rgba(139, 92, 246, 0.12);
+            --glass-border-hover: rgba(139, 92, 246, 0.35);
+        }
+
+        section {
+            padding: clamp(40px, 6vw, 80px) clamp(16px, 4vw, 24px) !important;
+        }
+
+        .section-badge {
+            margin-bottom: clamp(10px, 2vw, 16px) !important;
+        }
+
+        .section-title {
+            font-size: clamp(24px, 4vw, 36px) !important;
+            margin-bottom: clamp(16px, 3vw, 24px) !important;
+        }
+
+        /* 2. Navigation & Mobile Menu Layout */
+        @media (max-width: 768px) {
+            #navbar .nav-inner {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 0 16px !important;
+                height: 64px !important;
+            }
+
+            #navbar .logo {
+                order: 1 !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            #navbar .logo img {
+                height: clamp(34px, 7vw, 42px) !important;
+                width: auto !important;
+            }
+
+            #navbar .theme-toggle-nav {
+                order: 2 !important;
+                margin-left: auto !important;
+                margin-right: 12px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            #navbar .hamburger {
+                order: 3 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 5px !important;
+                cursor: pointer !important;
+                padding: 10px !important; /* Larger touch target */
+                z-index: 1001 !important;
+            }
+
+            #navbar .hamburger span {
+                display: block !important;
+                width: 22px !important;
+                height: 2px !important;
+                background: var(--text) !important;
+                border-radius: 2px !important;
+                transition: all 0.3s ease !important;
+            }
+
+            /* Hamburger X animation when active */
+            #navbar .hamburger.active span:nth-child(1) {
+                transform: translateY(7px) rotate(45deg) !important;
+            }
+
+            #navbar .hamburger.active span:nth-child(2) {
+                opacity: 0 !important;
+            }
+
+            #navbar .hamburger.active span:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg) !important;
+            }
+
+            #mob.mobile-menu {
+                display: flex !important;
+                position: fixed !important;
+                top: 64px !important;
+                left: 0 !important;
+                right: 0 !important;
+                background: var(--nav-bg) !important;
+                backdrop-filter: blur(24px) !important;
+                -webkit-backdrop-filter: blur(24px) !important;
+                padding: 24px 20px !important;
+                z-index: 999 !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+                opacity: 0 !important;
+                transform: translateY(-15px) !important;
+                pointer-events: none !important;
+                transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                border-bottom: 1px solid var(--border) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            #mob.mobile-menu.open {
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+                pointer-events: all !important;
+            }
+
+            #mob.mobile-menu a {
+                font-size: 16px !important;
+                padding: 12px 16px !important;
+                border-radius: 8px !important;
+                color: var(--muted) !important;
+                transition: all 0.25s !important;
+                font-weight: 500 !important;
+                background: rgba(255, 255, 255, 0.01) !important;
+                border: 1px solid transparent !important;
+            }
+
+            #mob.mobile-menu a:hover,
+            #mob.mobile-menu a.active {
+                color: var(--text) !important;
+                background: var(--glass) !important;
+                border-color: var(--border) !important;
+                padding-left: 20px !important;
+            }
+        }
+
+        /* 3. Hero & Stats Responsive Layout */
+        .page-hero {
+            padding: clamp(60px, 8vw, 100px) 24px clamp(50px, 6vw, 80px) !important;
+        }
+
+        .page-hero-inner {
+            display: grid !important;
+            grid-template-columns: 1.15fr 0.85fr !important;
+            gap: clamp(40px, 6vw, 80px) !important;
+            align-items: center !important;
+            text-align: left !important;
+            max-width: 1280px !important;
+            margin: 0 auto !important;
+            width: 100% !important;
+        }
+
+        .page-hero h1 {
+            text-align: left !important;
+            font-size: clamp(32px, 5vw, 54px) !important;
+            line-height: 1.15 !important;
+            margin-bottom: clamp(16px, 2.5vw, 24px) !important;
+        }
+
+        .page-hero p.hero-desc {
+            text-align: left !important;
+            margin-bottom: clamp(24px, 3.5vw, 36px) !important;
+            font-size: clamp(15px, 1.8vw, 17px) !important;
+            line-height: 1.7 !important;
+            max-width: 100% !important;
+        }
+
+        .page-hero .btn-primary {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: clamp(12px, 2vw, 15px) clamp(24px, 3.5vw, 32px) !important;
+            font-size: clamp(14px, 1.5vw, 15px) !important;
+            border-radius: 10px !important;
+            min-height: 48px !important; /* Touch friendly */
+        }
+
+        .ip-stats {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: clamp(12px, 2vw, 18px) !important;
+            width: 100% !important;
+        }
+
+        .ip-stat {
+            background: rgba(139, 92, 246, 0.08) !important;
+            border: 1px solid rgba(139, 92, 246, 0.18) !important;
+            border-radius: 14px !important;
+            padding: clamp(14px, 2.5vw, 22px) 12px !important;
+            text-align: center !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .ip-stat:hover {
+            transform: translateY(-2px) !important;
+            background: rgba(139, 92, 246, 0.12) !important;
+            border-color: rgba(139, 92, 246, 0.3) !important;
+        }
+
+        .ip-stat .num {
+            font-size: clamp(22px, 3.5vw, 30px) !important;
+            font-weight: 800 !important;
+        }
+
+        .ip-stat .lbl {
+            font-size: clamp(10px, 1.1vw, 12px) !important;
+            line-height: 1.3 !important;
+            margin-top: 6px !important;
+        }
+
+        /* Hero Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .page-hero-inner {
+                grid-template-columns: 1fr !important;
+                text-align: center !important;
+                gap: 48px !important;
+            }
+
+            .page-hero h1,
+            .page-hero p.hero-desc {
+                text-align: center !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+
+            .page-hero p.hero-desc {
+                max-width: 650px !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .ip-stats {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .page-hero {
+                padding: 50px 16px 40px !important;
+            }
+
+            .ip-stats {
+                gap: 8px !important;
+            }
+
+            .ip-stat {
+                padding: 12px 8px !important;
+                border-radius: 10px !important;
+            }
+        }
+
+        /* 4. IP Card Grid Improvements */
+        .ip-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: clamp(16px, 2.5vw, 28px) !important;
+            margin-top: clamp(24px, 4vw, 40px) !important;
+        }
+
+        .ip-card {
+            background: rgba(8, 12, 24, 0.6) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 20px !important;
+            padding: clamp(20px, 3.5vw, 32px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            height: 100% !important;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+        }
+
+        /* Dark/Light mode card compatibility override */
+        [data-theme="light"] .ip-card {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+
+        .ip-card h3 {
+            font-size: clamp(16px, 2vw, 19px) !important;
+            line-height: 1.35 !important;
+            margin-bottom: 12px !important;
+        }
+
+        .ip-card p {
+            font-size: clamp(13px, 1.5vw, 14px) !important;
+            line-height: 1.6 !important;
+            margin-bottom: 24px !important;
+            flex-grow: 1 !important; /* Pushes tags and footer down to align equally */
+        }
+
+        .ip-tags {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .ip-tag {
+            font-size: 11px !important;
+            padding: 4px 10px !important;
+            border-radius: 100px !important;
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--muted) !important;
+        }
+
+        [data-theme="light"] .ip-tag {
+            background: rgba(15, 23, 42, 0.03) !important;
+            border-color: rgba(15, 23, 42, 0.06) !important;
+        }
+
+        .ip-footer {
+            border-top: 1px solid var(--border) !important;
+            padding-top: 16px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+
+        .ip-action {
+            font-size: clamp(12.5px, 1.5vw, 13.5px) !important;
+            padding: 6px 12px !important;
+            border-radius: 6px !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .ip-action:hover {
+            background: rgba(14, 165, 233, 0.08) !important;
+            transform: translateX(2px) !important;
+        }
+
+        /* IP Cards Grid Breakpoints */
+        @media (max-width: 1024px) {
+            .ip-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ip-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+        }
+
+        /* 5. Research Showcase Responsive Improvements */
+        .research-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: clamp(16px, 2.5vw, 24px) !important;
+            margin-top: clamp(24px, 4vw, 40px) !important;
+        }
+
+        .research-card {
+            background: var(--card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 20px !important;
+            padding: clamp(20px, 3.5vw, 32px) !important;
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 20px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            height: 100% !important;
+        }
+
+        .research-card:hover {
+            border-color: rgba(6, 182, 212, 0.3) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 15px 30px rgba(6, 182, 212, 0.08) !important;
+        }
+
+        .research-icon {
+            width: 56px !important;
+            height: 56px !important;
+            min-width: 56px !important;
+            border-radius: 16px !important;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(139, 92, 246, 0.15)) !important;
+            border: 1px solid rgba(6, 182, 212, 0.25) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .research-content {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            flex-grow: 1 !important;
+        }
+
+        .research-content h3 {
+            font-size: clamp(16px, 2vw, 18px) !important;
+            margin-bottom: 8px !important;
+            line-height: 1.35 !important;
+        }
+
+        .research-content p {
+            font-size: clamp(13px, 1.5vw, 14px) !important;
+            line-height: 1.6 !important;
+            margin-bottom: 16px !important;
+            color: var(--muted) !important;
+        }
+
+        .research-meta {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 8px 16px !important;
+            font-size: 12px !important;
+            color: var(--muted) !important;
+            margin-top: auto !important;
+        }
+
+        .research-meta span {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+        }
+
+        @media (max-width: 1024px) {
+            .research-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .research-card {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 16px !important;
+                padding: 20px !important;
+            }
+
+            .research-icon {
+                width: 48px !important;
+                height: 48px !important;
+                min-width: 48px !important;
+                font-size: 20px !important;
+            }
+        }
+
+        /* 6. Licensing Grid Responsiveness */
+        .licensing-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: clamp(16px, 2.5vw, 24px) !important;
+            margin-top: clamp(24px, 4vw, 40px) !important;
+        }
+
+        .licensing-card {
+            background: var(--card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 18px !important;
+            padding: clamp(20px, 3.5vw, 32px) !important;
+            text-align: center !important;
+            height: 100% !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .licensing-card:hover {
+            border-color: rgba(37, 99, 235, 0.3) !important;
+            transform: translateY(-4px) !important;
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.08) !important;
+        }
+
+        .licensing-card h3 {
+            font-size: clamp(16.5px, 2vw, 18px) !important;
+            margin-bottom: 10px !important;
+        }
+
+        .licensing-card p {
+            font-size: clamp(13px, 1.5vw, 14px) !important;
+            line-height: 1.6 !important;
+            color: var(--muted) !important;
+        }
+
+        @media (max-width: 1024px) {
+            .licensing-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .licensing-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+        }
+
+        /* 7. CTA Banner Stacking & Footer Optimization */
+        .cta-banner h2 {
+            font-size: clamp(24px, 4.5vw, 42px) !important;
+            line-height: 1.2 !important;
+        }
+
+        .cta-banner p {
+            font-size: clamp(15px, 2vw, 17px) !important;
+            max-width: 600px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        .cta-banner .btn-white {
+            padding: clamp(12px, 2vw, 15px) clamp(28px, 3.5vw, 36px) !important;
+            font-size: clamp(14px, 1.5vw, 15px) !important;
+            min-height: 48px !important;
+        }
+
+        .newsletter-form {
+            display: flex !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+
+        .newsletter-form input {
+            min-height: 40px !important;
+        }
+
+        .newsletter-form button {
+            min-height: 40px !important;
+            padding: 10px 20px !important;
+        }
+
+        @media (max-width: 480px) {
+            .newsletter-form {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+
+            .newsletter-form button {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                gap: 40px !important;
+            }
+
+            .footer-bottom {
+                flex-direction: column !important;
+                text-align: center !important;
+                gap: 16px !important;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
