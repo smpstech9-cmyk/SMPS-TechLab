@@ -831,14 +831,14 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: var(--text);
-            color: var(--bg);
+            background: var(--text) !important;
+            color: var(--bg) !important;
             font-family: var(--font-heading);
             font-size: 14px;
             font-weight: 700;
             padding: 13px 28px;
             border-radius: 100px;
-            border: 1px solid var(--text);
+            border: 1px solid var(--text) !important;
             text-decoration: none;
             letter-spacing: 0.2px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -846,8 +846,8 @@
         }
 
         .placement-section .cta-primary:hover {
-            background: transparent;
-            color: var(--text);
+            background: transparent !important;
+            color: var(--text) !important;
             box-shadow: 0 0 0 1px var(--text), 0 8px 24px rgba(0, 0, 0, 0.15);
             transform: translateY(-2px);
         }
