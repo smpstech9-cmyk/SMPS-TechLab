@@ -1839,8 +1839,10 @@
         }
 
         /* Sleek Glassmorphic Logo Cards */
-        .logo-card {
-            background: var(--logo-bg) !important;
+        .logo-card,
+        .partner-logo,
+        .company-logo-container {
+            background: #ffffff !important;
             border: 1px solid var(--logo-border) !important;
             border-radius: 16px !important;
             padding: 12px 24px !important;
@@ -1862,10 +1864,12 @@
             flex-shrink: 0 !important;
         }
 
-        .logo-card:hover {
+        .logo-card:hover,
+        .partner-logo:hover,
+        .company-logo-container:hover {
             transform: translateY(-2px) scale(1.03) !important;
             border-color: var(--logo-hover-border) !important;
-            background: var(--logo-hover-bg) !important;
+            background: #ffffff !important;
             box-shadow: var(--logo-hover-shadow) !important;
         }
 
