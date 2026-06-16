@@ -285,6 +285,9 @@ async function initializeAwardsPopup() {
         updateFocusableElements();
         closeButton.focus();
         window.addEventListener('keydown', onKeyDown);
+
+        // Auto-close popup after 4 seconds (within the 3 to 5 seconds range)
+        setTimeout(closePopup, 4000);
     };
 
     const closePopup = () => {
