@@ -13,12 +13,14 @@
     <title>SMPS Tech Lab — Bridging Academia & Industry</title>
     <meta name="description"
         content="SMPS Tech Lab provides real-world project experience and practical industry exposure for engineering students. We bridge the academic-industry gap to make you job-ready.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
     <style>
         /* ─────────────────────────────────────────────────────────
            PREMIUM FONT STACK: Plus Jakarta Sans + Inter + Fraunces
            Used by top SaaS, AI startups, and design-forward brands
         ───────────────────────────────────────────────────────── */
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap');
 
 
         :root {
@@ -3121,29 +3123,6 @@
             t.textContent = msg; t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
         }
-
-        async function loadHomeData() {
-            let homeData = null;
-            try {
-                const res = await fetch('/api/settings/homeData');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && Object.keys(data).length > 0) {
-                        homeData = data;
-                    }
-                }
-            } catch (e) { }
-            if (!homeData) {
-                try {
-                    homeData = await DataStore.getDocument('homeData', {});
-                } catch (e) { }
-            }
-            if (homeData) {
-                if (homeData.heroTitle) { document.querySelector('.hero h1').innerHTML = homeData.heroTitle; }
-                if (homeData.heroSub) { document.querySelector('.hero p').textContent = homeData.heroSub; }
-            }
-        }
-        window.addEventListener('load', loadHomeData);
 
         // DYNAMIC LOGO RENDERING
         const clients = [
