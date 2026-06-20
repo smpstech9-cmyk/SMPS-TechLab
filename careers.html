@@ -356,6 +356,11 @@
     </style>
 
     <script>
+        const defaultBackendPort = '5002';
+        const apiBase = ((window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== defaultBackendPort)
+            ? `http://127.0.0.1:${defaultBackendPort}`
+            : '';
+
         let allJobs = [];
         let currentFilter = 'all';
 
@@ -423,27 +428,40 @@
 
         async function loadJobs() {
             try {
-                const res = await fetch('/api/jobs?_=' + Date.now());
+                const res = await fetch(apiBase + '/api/jobs?_=' + Date.now());
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data)) {
+                    if (Array.isArray(data) && data.length > 0) {
                         allJobs = data;
                         renderJobs(data);
+                        
+                        // Sync to DataStore cache
+                        if (window.DataStore && typeof DataStore.saveList === 'function') {
+                            try {
+                                await DataStore.saveList('jobs', data);
+                            } catch (se) {}
+                        }
                         return;
                     }
                 }
             } catch (e) {
-                console.warn('Failed to load jobs from backend', e);
+                console.warn('Failed to load jobs from backend, trying DataStore...', e);
             }
-            // Fallback: localStorage cache
-            try {
-                const cached = localStorage.getItem('smps_sandbox_jobs') || localStorage.getItem('jobs');
-                if (cached) {
-                    allJobs = JSON.parse(cached);
-                    renderJobs(allJobs);
-                    return;
+
+            // Fallback to DataStore (realtime/localStorage cached list)
+            if (window.DataStore && typeof DataStore.getList === 'function') {
+                try {
+                    const cached = await DataStore.getList('jobs', null);
+                    if (Array.isArray(cached) && cached.length > 0) {
+                        allJobs = cached;
+                        renderJobs(allJobs);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Failed to fetch jobs from DataStore fallback', e);
                 }
-            } catch (e) {}
+            }
+
             document.getElementById('jobsLoading').style.display = 'none';
             document.getElementById('noJobsMsg').style.display = 'block';
         }

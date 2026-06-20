@@ -6,6 +6,21 @@
 
 'use strict';
 
+const defaultBackendPort = '5002';
+const apiBase = ((window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== defaultBackendPort)
+    ? `http://127.0.0.1:${defaultBackendPort}`
+    : '';
+
+if (apiBase) {
+    const originalFetch = window.fetch;
+    window.fetch = function(input, init) {
+        if (typeof input === 'string' && input.startsWith('/api/')) {
+            input = apiBase + input;
+        }
+        return originalFetch(input, init);
+    };
+}
+
 // Clean up any stale sandbox cached lists from localStorage to prevent dummy data leakages
 ['eventsData', 'events', 'execomMembers', 'advisors', 'galleryData', 'gallery'].forEach(key => {
   localStorage.removeItem('smps_sandbox_' + key);
@@ -1378,7 +1393,6 @@ const Products = (() => {
   const STATUS_COLORS = { Live: 'pill-green', Development: 'pill-gold', Beta: 'pill-cyan', Deprecated: 'pill-red' };
 
   async function getAll() {
-    // SQLite is the single source of truth — always fetch fresh from the API
     try {
       const res = await fetch('/api/products?_=' + Date.now());
       if (res.ok) {
@@ -1389,10 +1403,22 @@ const Products = (() => {
         }
       }
     } catch (e) {
-      console.warn('Backend products fetch failed, using memory cache', e);
+      console.warn('Backend products fetch failed, trying DataStore...', e);
     }
-    // Fallback: in-memory cache only (never use dummy Defaults)
-    return window._cachedProducts !== undefined ? window._cachedProducts : [];
+
+    if (window._cachedProducts !== undefined) return window._cachedProducts;
+
+    try {
+      const list = await DataStore.getList('products', null);
+      if (Array.isArray(list) && list.length > 0) {
+        window._cachedProducts = list;
+        return list;
+      }
+    } catch (e) {
+      console.warn('DataStore getList failed for products', e);
+    }
+
+    return [];
   }
 
   async function saveAll(list) {
@@ -1747,9 +1773,24 @@ const Execom = (() => {
         }
       }
     } catch (e) {
-      console.warn('Backend execom fetch failed, using memory cache', e);
+      console.warn('Backend execom fetch failed, trying DataStore...', e);
     }
-    return window._cachedExecomData !== undefined ? window._cachedExecomData : [];
+
+    if (window._cachedExecomData !== undefined) return window._cachedExecomData;
+
+    try {
+      const execs = await DataStore.getList('execomMembers', null);
+      const advs = await DataStore.getList('advisors', null);
+      if ((Array.isArray(execs) && execs.length > 0) || (Array.isArray(advs) && advs.length > 0)) {
+        const combined = [...(execs || []), ...(advs || [])];
+        window._cachedExecomData = combined;
+        return combined;
+      }
+    } catch (e) {
+      console.warn('DataStore getList failed for execom', e);
+    }
+
+    return [];
   }
 
   async function saveAll(list) {
@@ -2062,9 +2103,22 @@ const Events = (() => {
         }
       }
     } catch (e) {
-      console.warn('Backend events fetch failed, using memory cache', e);
+      console.warn('Backend events fetch failed, trying DataStore...', e);
     }
-    return window._cachedEventsData !== undefined ? window._cachedEventsData : [];
+
+    if (window._cachedEventsData !== undefined) return window._cachedEventsData;
+
+    try {
+      const list = await DataStore.getList('eventsData', null);
+      if (Array.isArray(list) && list.length > 0) {
+        window._cachedEventsData = list;
+        return list;
+      }
+    } catch (e) {
+      console.warn('DataStore getList failed for events', e);
+    }
+
+    return [];
   }
 
   async function saveAll(list) {

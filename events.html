@@ -1228,6 +1228,11 @@
     
 
     <script>
+        const defaultBackendPort = '5002';
+        const apiBase = ((window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== defaultBackendPort)
+            ? `http://127.0.0.1:${defaultBackendPort}`
+            : '';
+
         // Theme Toggle Logic
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
@@ -1277,7 +1282,7 @@
         async function loadEventsSettings() {
             let settings = defaultEventsSettings;
             try {
-                const res = await fetch('/api/settings/eventsSettings');
+                const res = await fetch(apiBase + '/api/settings/eventsSettings');
                 if (res.ok) {
                     const data = await res.json();
                     if (data && Object.keys(data).length > 0) {
@@ -1356,18 +1361,40 @@
 
         async function loadEvents() {
             try {
-                const res = await fetch('/api/events?_=' + Date.now());
+                const res = await fetch(apiBase + '/api/events?_=' + Date.now());
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data)) {
+                    if (Array.isArray(data) && data.length > 0) {
                         eventsData = data;
                         renderFeaturedEvent();
                         renderEvents();
+                        
+                        // Sync to DataStore cache
+                        if (window.DataStore && typeof DataStore.saveList === 'function') {
+                            try {
+                                await DataStore.saveList('eventsData', data);
+                            } catch (se) {}
+                        }
                         return;
                     }
                 }
             } catch (error) {
-                console.warn('Failed to fetch events from backend API', error);
+                console.warn('Failed to fetch events from backend API, trying DataStore...', error);
+            }
+
+            // Fallback to DataStore/local storage
+            if (window.DataStore && typeof DataStore.getList === 'function') {
+                try {
+                    const localEvents = await DataStore.getList('eventsData', null);
+                    if (Array.isArray(localEvents) && localEvents.length > 0) {
+                        eventsData = localEvents;
+                        renderFeaturedEvent();
+                        renderEvents();
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Failed to fetch events from DataStore fallback', e);
+                }
             }
 
             eventsData = [];

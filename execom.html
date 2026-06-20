@@ -1319,6 +1319,11 @@
     
 
     <script>
+        const defaultBackendPort = '5002';
+        const apiBase = ((window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== defaultBackendPort)
+            ? `http://127.0.0.1:${defaultBackendPort}`
+            : '';
+
         // Theme Toggle Logic
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
@@ -1357,7 +1362,7 @@
 
             if (originalUrl && originalUrl.startsWith('http')) {
                 // Try resolving via backend proxy
-                fetch('/api/resolve-image?url=' + encodeURIComponent(originalUrl))
+                fetch(apiBase + '/api/resolve-image?url=' + encodeURIComponent(originalUrl))
                     .then(res => {
                         if (res.ok) return res.json();
                         throw new Error('Failed to resolve');
@@ -1432,7 +1437,7 @@
         async function loadExecomSettings() {
             let settings = defaultExecomSettings;
             try {
-                const res = await fetch('/api/settings/execomSettings');
+                const res = await fetch(apiBase + '/api/settings/execomSettings');
                 if (res.ok) {
                     const data = await res.json();
                     if (data && Object.keys(data).length > 0) {
@@ -1488,20 +1493,52 @@
 
         async function loadCommittee() {
             try {
-                const res = await fetch('/api/execom?_=' + Date.now());
+                const res = await fetch(apiBase + '/api/execom?_=' + Date.now());
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data)) {
+                    if (Array.isArray(data) && data.length > 0) {
                         execomMembers = data.filter(x => x.type === 'execom');
                         advisors = data.filter(x => x.type === 'advisor');
                         renderExecom();
                         renderAdvisors();
                         initReveal();
+                        
+                        // Sync to DataStore cache
+                        if (window.DataStore && typeof DataStore.saveList === 'function') {
+                            try {
+                                await DataStore.saveList('execomMembers', execomMembers);
+                                await DataStore.saveList('advisors', advisors);
+                            } catch (se) {}
+                        }
                         return;
                     }
                 }
             } catch (error) {
-                console.warn('Failed to fetch committee from backend API', error);
+                console.warn('Failed to fetch committee from backend API, trying DataStore...', error);
+            }
+
+            // Fallback to DataStore/local storage
+            if (window.DataStore && typeof DataStore.getList === 'function') {
+                try {
+                    const localExecs = await DataStore.getList('execomMembers', null);
+                    const localAdvisors = await DataStore.getList('advisors', null);
+                    if (Array.isArray(localExecs) && localExecs.length > 0) {
+                        execomMembers = localExecs;
+                    } else {
+                        execomMembers = [];
+                    }
+                    if (Array.isArray(localAdvisors) && localAdvisors.length > 0) {
+                        advisors = localAdvisors;
+                    } else {
+                        advisors = [];
+                    }
+                    renderExecom();
+                    renderAdvisors();
+                    initReveal();
+                    return;
+                } catch (e) {
+                    console.warn('Failed to fetch committee from DataStore fallback', e);
+                }
             }
 
             execomMembers = [];

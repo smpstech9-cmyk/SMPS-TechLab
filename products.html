@@ -1232,6 +1232,11 @@
     
 
     <script>
+        const defaultBackendPort = '5002';
+        const apiBase = ((window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port !== defaultBackendPort)
+            ? `http://127.0.0.1:${defaultBackendPort}`
+            : '';
+
         // ─── Theme ───────────────────────────────────────────────────────────
         const htmlElement = document.documentElement;
         const themeToggle = document.getElementById('themeToggle');
@@ -1273,7 +1278,7 @@
 
             if (originalUrl && originalUrl.startsWith('http')) {
                 // Try resolving via backend proxy
-                fetch('/api/resolve-image?url=' + encodeURIComponent(originalUrl))
+                fetch(apiBase + '/api/resolve-image?url=' + encodeURIComponent(originalUrl))
                     .then(res => {
                         if (res.ok) return res.json();
                         throw new Error('Failed to resolve');
@@ -1297,7 +1302,7 @@
         async function loadProductsSettings() {
             let d = null;
             try {
-                const res = await fetch('/api/settings/productsSettings');
+                const res = await fetch(apiBase + '/api/settings/productsSettings');
                 if (res.ok) {
                     d = await res.json();
                 }
@@ -1339,7 +1344,7 @@
         // ─── Fetch products from SQLite backend ──────────────────────────────
         async function getProducts() {
             try {
-                const res = await fetch('/api/products?_=' + Date.now());
+                const res = await fetch(apiBase + '/api/products?_=' + Date.now());
                 if (res.ok) {
                     const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) return data;
