@@ -5,7 +5,8 @@
   const originalFetch = window.fetch;
   window.fetch = function (input, init) {
     const backendPort = '5500';
-    if (window.location.port !== backendPort) {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocal && window.location.port !== backendPort) {
       if (typeof input === 'string') {
         if (input.startsWith('/api/')) {
           input = `http://127.0.0.1:${backendPort}${input}`;

@@ -8,5 +8,5 @@
     "baseUri": "/api",
     "proxyUri": "http://127.0.0.1:5002/api"
   },
-  "liveServer.settings.port": 5500
+  "liveServer.settings.port": 5501
 }

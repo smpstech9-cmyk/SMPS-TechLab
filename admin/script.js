@@ -4180,41 +4180,75 @@ function setupImageUploaders() {
       const file = fileInput.files[0];
       if (!file) return;
       btn.textContent = '⏳ Uploading...';
+      
+      let uploadedUrl = null;
+      let firebaseError = null;
+
+      // 1. Try Firebase Cloud Storage first
       try {
-        const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const headers = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-        
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          headers: headers,
-          body: formData
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          if (data.url) {
-            input.value = data.url;
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-            input.dispatchEvent(new Event('change', { bubbles: true }));
-            btn.textContent = '✅ Uploaded';
-            Toast.show('Image uploaded successfully!', 'success');
-          } else {
-            throw new Error('No URL in response');
-          }
+        const firebaseInstance = window.firebase;
+        if (firebaseInstance && typeof firebaseInstance.storage === 'function') {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `img_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${fileExt}`;
+          
+          const storageRef = firebaseInstance.storage().ref();
+          const fileRef = storageRef.child(`uploads/${fileName}`);
+          
+          const snapshot = await fileRef.put(file);
+          uploadedUrl = await snapshot.ref.getDownloadURL();
         } else {
-          const errData = await res.json();
-          throw new Error(errData.error || 'Failed to upload image');
+          throw new Error('Firebase Storage SDK not available.');
         }
       } catch (err) {
-        console.error('Image upload failed:', err);
-        btn.textContent = '❌ Failed';
-        Toast.show('Image upload failed: ' + err.message, 'error');
+        console.warn('Firebase Storage upload failed, falling back to local backend:', err);
+        firebaseError = err.message;
+      }
+
+      // 2. Fall back to Flask API upload if Firebase failed
+      if (!uploadedUrl) {
+        try {
+          const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          const headers = {};
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+          
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: headers,
+            body: formData
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            if (data.url) {
+              uploadedUrl = data.url;
+            } else {
+              throw new Error('No URL in response');
+            }
+          } else {
+            const errData = await res.json();
+            throw new Error(errData.error || 'Failed to upload image');
+          }
+        } catch (err) {
+          console.error('Local image upload fallback failed:', err);
+          btn.textContent = '❌ Failed';
+          const errMsg = firebaseError ? `Firebase error: ${firebaseError}. Local error: ${err.message}` : err.message;
+          Toast.show('Image upload failed: ' + errMsg, 'error');
+          return;
+        }
+      }
+
+      // 3. Apply the uploaded URL to the input
+      if (uploadedUrl) {
+        input.value = uploadedUrl;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        btn.textContent = '✅ Uploaded';
+        Toast.show('Image uploaded successfully!', 'success');
       }
     });
 
