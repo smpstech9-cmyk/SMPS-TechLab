@@ -4255,6 +4255,75 @@ function setupImageUploaders() {
     input.parentNode.appendChild(fileInput);
     input.parentNode.appendChild(btn);
   });
+
+  setupImageURLResolvers();
+}
+
+function setupImageURLResolvers() {
+  const ids = ['pm-img', 'em-img', 'ev-img', 'gm-img'];
+  ids.forEach(id => {
+    const input = document.getElementById(id);
+    if (!input) return;
+
+    const handleUrlChange = async () => {
+      const url = input.value.trim();
+      if (!url || !url.startsWith('http')) return;
+
+      const lower = url.toLowerCase();
+      const hasImageExtension = lower.includes('.jpg') || 
+                                lower.includes('.jpeg') || 
+                                lower.includes('.png') || 
+                                lower.includes('.gif') || 
+                                lower.includes('.webp') || 
+                                lower.includes('.svg');
+
+      if (hasImageExtension || lower.includes('/assets/uploads/')) {
+        return;
+      }
+
+      if (input.dataset.resolving === 'true' || input.dataset.lastResolved === url) return;
+
+      const uploadBtn = input.parentNode.querySelector('.btn-upload-file');
+      const originalBtnText = uploadBtn ? uploadBtn.textContent : '';
+      
+      input.dataset.resolving = 'true';
+      if (uploadBtn) {
+        uploadBtn.textContent = '⏳ Resolving...';
+        uploadBtn.disabled = true;
+      }
+
+      try {
+        const res = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.status === 'success' && json.data && json.data.image && json.data.image.url) {
+            const resolvedUrl = json.data.image.url;
+            input.value = resolvedUrl;
+            input.dataset.lastResolved = resolvedUrl;
+            
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            if (uploadBtn) uploadBtn.textContent = '✅ Resolved';
+            Toast.show('Webpage link resolved to direct image successfully!', 'success');
+          } else {
+            throw new Error('No image found on this page.');
+          }
+        } else {
+          throw new Error('Failed to fetch page metadata.');
+        }
+      } catch (err) {
+        console.warn('URL metadata resolution failed:', err);
+        if (uploadBtn) uploadBtn.textContent = originalBtnText;
+      } finally {
+        input.dataset.resolving = 'false';
+        if (uploadBtn) uploadBtn.disabled = false;
+      }
+    };
+
+    input.addEventListener('change', handleUrlChange);
+    input.addEventListener('blur', handleUrlChange);
+  });
 }
 
 function setupRealtimeSubscriptions() {
