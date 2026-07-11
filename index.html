@@ -3662,19 +3662,92 @@
                 // Take first 3 products
                 const featured = products.slice(0, 3);
 
-                grid.innerHTML = featured.map((p, i) => `
-                    <div class="product-card reveal" onclick="window.location.href='products.html'" style="animation-delay:${i * .1}s">
+                grid.innerHTML = featured.map((p, i) => {
+                    // Split out flagship brand name from parentheses if present
+                    let rawName = p.name || '';
+                    let mainName = rawName;
+                    let modelName = '';
+                    if (rawName.includes('(')) {
+                        let parts = rawName.split('(');
+                        modelName = parts[0].trim();
+                        mainName = parts[1].replace(')', '').trim();
+                    } else if (rawName.includes('—')) {
+                        let parts = rawName.split('—');
+                        modelName = parts[0].trim();
+                        mainName = parts[1].trim();
+                    }
+
+                    // Determine premium category badge
+                    const lowerName = rawName.toLowerCase();
+                    const tagKey = p.tag || 'hardware';
+                    let categoryBadge = "Power Electronics";
+                    if (tagKey === 'hardware' || lowerName.includes('power') || lowerName.includes('charge')) {
+                        categoryBadge = "EV Infrastructure";
+                    } else if (tagKey === 'ai-software' || lowerName.includes('ai') || lowerName.includes('software')) {
+                        categoryBadge = "Industrial AI";
+                    } else if (tagKey === 'iiot' || lowerName.includes('iot') || lowerName.includes('automation')) {
+                        categoryBadge = "Industrial Automation";
+                    }
+
+                    // Short engineering statement
+                    let engineeringStatement = p.desc || 'Next-generation critical power infrastructure.';
+                    if (engineeringStatement.length > 80) {
+                        engineeringStatement = engineeringStatement.split('.')[0] + '.';
+                    }
+
+                    // Determine 3 premium highlight blocks
+                    let highlights = [];
+                    if (tagKey === 'hardware' || lowerName.includes('power') || lowerName.includes('charge')) {
+                        highlights = [
+                            { val: "22kW", lbl: "Power" },
+                            { val: "IP65", lbl: "Protection" },
+                            { val: "CE", lbl: "Certified" }
+                        ];
+                    } else if (tagKey === 'ai-software' || lowerName.includes('ai') || lowerName.includes('software')) {
+                        highlights = [
+                            { val: "< 5ms", lbl: "Latency" },
+                            { val: "99.8%", lbl: "Accuracy" },
+                            { val: "CUDA", lbl: "Accel" }
+                        ];
+                    } else {
+                        highlights = [
+                            { val: "MQTT", lbl: "Protocol" },
+                            { val: "ARM M4", lbl: "Core" },
+                            { val: "IP67", lbl: "Enclosure" }
+                        ];
+                    }
+
+                    const highlightsHtml = `
+                        <div class="product-highlights-row">
+                            ${highlights.map(h => `
+                                <div class="product-highlight-block">
+                                    <div class="product-highlight-value">${h.val}</div>
+                                    <div class="product-highlight-label">${h.lbl}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                    return `
+                    <div class="product-card reveal" onclick="window.location.href='products.html'" style="animation-delay:${i * 0.1}s">
                         <div class="product-img">
                             <img src="${p.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'}" alt="${p.name}" onerror="handleImageError(this, '${p.img}')">
-                            <span class="product-tag ${p.tagClass || 'tag-blue'}">${(p.tagLabel || p.tag || 'HARDWARE').toUpperCase()}</span>
+                            <span class="product-tag">${categoryBadge}</span>
                         </div>
                         <div class="product-body">
-                            <h3>${p.name}</h3>
-                            <p>${p.desc}</p>
-                            <a href="products.html" class="product-link">Explore Track →</a>
+                            <div class="product-body-cat">${categoryBadge}</div>
+                            <h3>${mainName}</h3>
+                            <div class="product-subtitle">${modelName || 'Enterprise Class'}</div>
+                            <p class="product-statement">${engineeringStatement}</p>
+                            
+                            ${highlightsHtml}
+                            
+                            <div class="product-meta">
+                                <span class="product-link">Explore Track &rarr;</span>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    </div>`;
+                }).join('');
 
                 // Re-run intersection observer on new cards
                 if (typeof observer !== 'undefined' && observer.observe) {
