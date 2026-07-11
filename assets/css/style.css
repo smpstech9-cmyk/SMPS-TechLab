@@ -4159,12 +4159,12 @@ html, body {
 
 /* ============================================================ UPDATES TICKER ============================================================ */
 .updates-ticker-wrap {
+    display: none !important;
     background: #0f4c81;
     color: #fff;
     font-size: 13px;
     font-weight: 600;
     height: 38px;
-    display: flex;
     align-items: center;
     overflow: hidden;
     border-bottom: 1px solid var(--border);

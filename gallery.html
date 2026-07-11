@@ -978,29 +978,6 @@
         </div>
     </nav>
     
-    <!-- Updates Strip Ticker -->
-    <div class="updates-ticker-wrap">
-        <div class="updates-label">UPDATES</div>
-        <div class="ticker-content-container">
-            <div class="ticker-track">
-                <span>Industry-Academia Conclave 2026 — VTU Regional Center Bengaluru</span>
-                <span>•</span>
-                <span>Smart Power Hub Training — Starting May 2026</span>
-                <span>•</span>
-                <span>VLSI Design & Verilog Bootcamp — Applications Open</span>
-                <span>•</span>
-                <span>Core Tech Placement Drive 2026 — Join Now</span>
-                <span>•</span>
-                <span>Industry-Academia Conclave 2026 — VTU Regional Center Bengaluru</span>
-                <span>•</span>
-                <span>Smart Power Hub Training — Starting May 2026</span>
-                <span>•</span>
-                <span>VLSI Design & Verilog Bootcamp — Applications Open</span>
-                <span>•</span>
-                <span>Core Tech Placement Drive 2026 — Join Now</span>
-            </div>
-        </div>
-    </div>
 
 
     <div class="page-hero">
@@ -1132,6 +1109,52 @@
     
 
     <script>
+        function formatHeroTitle(title) {
+            if (!title) return '';
+            title = title.trim();
+            if (!title.includes('<') && !title.includes('>')) {
+                // Capitalize first letter of each word
+                title = title.split(' ')
+                    .map(word => {
+                        if (!word) return '';
+                        return word.charAt(0).toUpperCase() + word.slice(1);
+                    })
+                    .join(' ');
+                
+                // Wrap last word in <span> for gradient styling
+                const words = title.split(' ');
+                if (words.length === 1) {
+                    title = `<span>${words[0]}</span>`;
+                } else {
+                    const lastWord = words.pop();
+                    title = `${words.join(' ')} <span>${lastWord}</span>`;
+                }
+            }
+            return title;
+        }
+
+        // ─── Apply Cached Gallery Settings Synchronously (Prevents Flash/Delay) ─
+        (function applyCachedGallerySettings() {
+            try {
+                const cached = localStorage.getItem('smps_gallery_settings_cache');
+                if (cached) {
+                    const settings = JSON.parse(cached);
+                    if (settings) {
+                        const setHTML = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerHTML = val; };
+                        const setText = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+                        setHTML('galHeroTitle', formatHeroTitle(settings.heroTitle));
+                        setText('galHeroDesc', settings.heroDesc);
+                        setText('btnGalAll', settings.catAll);
+                        setText('btnGalSummit', settings.catSummit);
+                        setText('btnGalWorkshop', settings.catWorkshop);
+                        setText('btnGalLab', settings.catLab);
+                    }
+                }
+            } catch (e) {
+                console.warn('Error applying cached gallery settings:', e);
+            }
+        })();
+
         // Gallery Data — do NOT clear localStorage here, admin panel writes data to it
         const defaultGalleryData = [];
 
@@ -1183,12 +1206,19 @@
             const setHTML = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerHTML = val; };
             const setText = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
 
-            setHTML('galHeroTitle', settings.heroTitle);
+            setHTML('galHeroTitle', formatHeroTitle(settings.heroTitle));
             setText('galHeroDesc', settings.heroDesc);
             setText('btnGalAll', settings.catAll);
             setText('btnGalSummit', settings.catSummit);
             setText('btnGalWorkshop', settings.catWorkshop);
             setText('btnGalLab', settings.catLab);
+
+            // Cache to local storage to prevent layout flashes on next refresh
+            try {
+                localStorage.setItem('smps_gallery_settings_cache', JSON.stringify(settings));
+            } catch (e) {
+                console.warn('Could not cache gallery settings in localStorage:', e);
+            }
         }
 
         let galleryData = [];
@@ -1470,13 +1500,18 @@
         }
 
         // Initial Render
-        window.addEventListener('DOMContentLoaded', () => {
-            loadGallery();
-            loadGallerySettings();
-        });
-        if (document.readyState !== 'loading') {
-            loadGallery();
-            loadGallerySettings();
+        let isGalleryInitialized = false;
+        async function initializeGalleryPage() {
+            if (isGalleryInitialized) return;
+            isGalleryInitialized = true;
+            await loadGallery();
+            await loadGallerySettings();
+        }
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            initializeGalleryPage();
+        } else {
+            window.addEventListener('DOMContentLoaded', initializeGalleryPage);
         }
 
         window.addEventListener('storage', (e) => {

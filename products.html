@@ -3,7 +3,7 @@
 
 <head>
     <script>
-        (function() {
+        (function () {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
@@ -14,18 +14,48 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
+        /* =============================================
+           SMPS TECH LAB — PREMIUM INDUSTRIAL PRODUCT PAGE
+            
+           ============================================= */
 
         :root {
-            --dot-color: rgba(255, 255, 255, 0.03);
+            --dot-color: rgba(255, 255, 255, 0.025);
+            --prod-bg: #F8FAFC;
+            --prod-surface: #ffffff;
+            --prod-border: rgba(15, 23, 42, 0.08);
+            --prod-border-hover: rgba(37, 99, 235, 0.25);
+            --prod-text: #0F172A;
+            --prod-muted: #64748B;
+            --prod-subtle: #94A3B8;
+            --prod-blue: #2563EB;
+            --prod-blue-light: rgba(37, 99, 235, 0.07);
+            --prod-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+            --prod-shadow-hover: 0 20px 48px rgba(15, 23, 42, 0.12), 0 4px 16px rgba(37, 99, 235, 0.08);
+            --font-eng: 'Space Grotesk', 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
         }
 
-        [data-theme="light"] {
-            --dot-color: rgba(15, 23, 42, 0.05);
+        [data-theme="dark"] {
+            --dot-color: rgba(255, 255, 255, 0.025);
+            --prod-bg: #080C14;
+            --prod-surface: #0E1420;
+            --prod-border: rgba(255, 255, 255, 0.07);
+            --prod-border-hover: rgba(59, 130, 246, 0.35);
+            --prod-text: #F1F5F9;
+            --prod-muted: #94A3B8;
+            --prod-subtle: #475569;
+            --prod-blue: #3B82F6;
+            --prod-blue-light: rgba(59, 130, 246, 0.1);
+            --prod-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --prod-shadow-hover: 0 20px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(59, 130, 246, 0.15);
         }
 
-        /* INSTANT CONTENT ACCESSIBILITY & VISIBILITY OVERRIDES */
+        /* ── VISIBILITY OVERRIDES ─────────────────────────── */
         .reveal {
             opacity: 1 !important;
             transform: none !important;
@@ -37,479 +67,18 @@
             transform: none !important;
         }
 
-        /* PAGE HERO OVERRIDES - SAAS OVERHAUL */
-        .page-hero {
-            text-align: center;
-            padding: 60px 24px 40px;
-            background: radial-gradient(circle 1200px at 50% -300px, rgba(59, 130, 246, 0.18), rgba(99, 102, 241, 0.06), transparent 80%);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 1px solid var(--border);
-        }
 
-        .page-hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(circle at 1px 1px, var(--dot-color) 1px, transparent 0);
-            background-size: 48px 48px;
-            opacity: 0.8;
-            pointer-events: none;
-            z-index: 1;
-        }
 
-        /* Floating Glow Spheres */
-        .hero-blur {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.25;
-            pointer-events: none;
-            z-index: 1;
-            transition: all 0.5s ease;
-        }
-
-        .blur-1 {
-            width: 350px;
-            height: 350px;
-            background: var(--accent);
-            top: 30%;
-            left: 15%;
-        }
-
-        .blur-2 {
-            width: 400px;
-            height: 400px;
-            background: var(--accent3);
-            bottom: 15%;
-            right: 10%;
-        }
-
-        [data-theme="light"] .hero-blur {
-            opacity: 0.12;
-            filter: blur(140px);
-        }
-
-        .page-hero-inner {
-            max-width: 1140px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .breadcrumb {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--muted);
-            margin-bottom: 24px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            padding: 6px 16px;
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
-            font-weight: 500;
-        }
-
-        /* Announcement Badge */
-        .announcement-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 12.5px;
-            font-weight: 500;
-            color: var(--text);
-            margin-bottom: 28px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .announcement-badge:hover {
-            border-color: rgba(59, 130, 246, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .badge-new {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 2px 8px;
-            border-radius: 100px;
-            letter-spacing: 0.05em;
-        }
-
-        .page-hero h1 {
-            font-family: var(--font-heading);
-            font-size: clamp(38px, 6vw, 62px);
-            font-weight: 800;
-            line-height: 1.15;
-            margin-bottom: 24px;
-            letter-spacing: -0.03em;
-            color: var(--text);
-            max-width: 900px;
-            text-align: center;
-        }
-
-        .page-hero h1 span {
-            font-family: var(--font-classic);
-            font-style: italic;
-            font-weight: 400;
-            background: linear-gradient(
-                90deg,
-                #3b82f6 0%,
-                #8b5cf6 25%,
-                #ec4899 50%,
-                #8b5cf6 75%,
-                #3b82f6 100%
-            );
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: flowingGlow 4s linear infinite;
-            text-shadow: none;
-            display: inline-block;
-            transition: transform 0.3s ease;
-        }
-
-        .page-hero h1 span:hover {
-            transform: scale(1.05);
-        }
-
-        .hero-subtitle {
-            font-size: clamp(16px, 2vw, 19px);
-            color: var(--muted);
-            max-width: 680px;
-            line-height: 1.6;
-            margin-bottom: 40px;
-            text-align: center;
-            font-weight: 400;
-        }
-
-        /* SaaS Actions Row */
-        .hero-ctas {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 56px;
-        }
-
-        @media (max-width: 480px) {
-            .hero-ctas {
-                flex-direction: column;
-                align-items: stretch;
-                width: 100%;
-                padding: 0 16px;
-            }
-        }
-
-        .btn-saas-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--text);
-            color: var(--bg) !important;
-            padding: 14px 32px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid var(--text);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-saas-primary:hover {
-            background: transparent;
-            color: var(--text) !important;
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        [data-theme="light"] .btn-saas-primary:hover {
-            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
-        }
-
-        .btn-saas-secondary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--glass);
-            color: var(--text) !important;
-            padding: 14px 32px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-saas-secondary:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        [data-theme="light"] .btn-saas-secondary:hover {
-            background: rgba(15, 23, 42, 0.03);
-            border-color: rgba(15, 23, 42, 0.15);
-        }
-
-        /* SaaS Metrics Segment */
-        .hero-stats-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 72px;
-            width: 100%;
-            max-width: 900px;
-        }
-
-        @media (max-width: 768px) {
-            .hero-stats-row {
-                flex-direction: column;
-                gap: 24px;
-            }
-            .stat-sep {
-                display: none !important;
-            }
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            flex: 1;
-        }
-
-        .stat-number {
-            font-size: clamp(28px, 4vw, 36px);
-            font-weight: 800;
-            font-family: var(--font-heading);
-            color: var(--text);
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--text), var(--muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .stat-sep {
-            width: 1px;
-            height: 40px;
-            background: var(--border);
-        }
-
-        /* SaaS Interactive Dashboard Mockup */
-        .hero-mockup {
-            width: 100%;
-            max-width: 960px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(20px);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateY(0);
-        }
-
-        .hero-mockup:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 40px 90px rgba(59, 130, 246, 0.15), 0 30px 70px rgba(0, 0, 0, 0.35);
-            border-color: rgba(59, 130, 246, 0.25);
-        }
-
-        .mockup-header {
-            background: rgba(10, 14, 26, 0.4);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .mockup-dots {
-            display: flex;
-            gap: 8px;
-        }
-
-        .mockup-dots span {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .dot-red { background: #ff5f56; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #27c93f; }
-
-        .mockup-tab {
-            font-family: var(--font-main);
-            font-size: 12.5px;
-            font-weight: 500;
-            color: var(--muted);
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            padding: 4px 16px;
-            border-radius: 6px;
-        }
-
-        .mockup-body {
-            display: flex;
-            height: 320px;
-            text-align: left;
-        }
-
-        @media (max-width: 640px) {
-            .mockup-body {
-                flex-direction: column;
-                height: auto;
-            }
-        }
-
-        .mockup-sidebar {
-            width: 220px;
-            background: rgba(5, 8, 16, 0.3);
-            border-right: 1px solid var(--border);
-            padding: 20px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        @media (max-width: 640px) {
-            .mockup-sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-                padding: 12px;
-                flex-direction: row;
-                overflow-x: auto;
-            }
-        }
-
-        .sidebar-item {
-            padding: 10px 16px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--muted);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            white-space: nowrap;
-        }
-
-        .sidebar-item:hover, .sidebar-item.active {
-            color: var(--text);
-            background: var(--bg3);
-        }
-
-        .mockup-content {
-            flex: 1;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background: rgba(3, 5, 10, 0.4);
-            gap: 20px;
-        }
-
-        .code-editor {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13.5px;
-            line-height: 1.6;
-            color: #9cdcfe;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .code-line {
-            display: block;
-        }
-
-        .c-keyword { color: #569cd6; }
-        .c-comment { color: #6a9955; font-style: italic; }
-
-        .mockup-telemetry {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .telemetry-card {
-            background: rgba(10, 14, 26, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .tel-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .tel-value {
-            font-size: 20px;
-            font-weight: 700;
-            font-family: var(--font-heading);
-            color: var(--accent);
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
-        }
-
-        @keyframes flowingGlow {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-        }
-
-        /* PREMIUM STICKY FILTER BAR */
+        /* ── FILTER BAR — INDUSTRIAL ──────────────────────── */
         .products-filter {
-            padding: 24px;
-            background: var(--bg2);
-            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            background: var(--prod-surface);
+            border-bottom: 1px solid var(--prod-border);
             position: sticky;
             top: 70px;
             z-index: 900;
             backdrop-filter: blur(20px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s;
+            box-shadow: 0 1px 0 var(--prod-border);
         }
 
         .filter-inner {
@@ -519,19 +88,22 @@
             justify-content: space-between;
             align-items: center;
             gap: 24px;
+            height: 64px;
         }
 
         @media (max-width: 768px) {
             .filter-inner {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 16px;
+                height: auto;
+                padding: 16px 0;
+                gap: 12px;
             }
         }
 
         .filter-groups {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             overflow-x: auto;
             padding-bottom: 2px;
             scrollbar-width: none;
@@ -542,41 +114,54 @@
         }
 
         .filter-btn {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 10px 22px;
-            border-radius: 100px;
+            background: transparent;
+            border: none;
+            color: var(--prod-muted);
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-family: var(--font-eng);
             font-size: 13.5px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.2s ease;
             white-space: nowrap;
             outline: none;
+            position: relative;
+        }
+
+        .filter-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 80%;
+            height: 2px;
+            background: var(--prod-blue);
+            border-radius: 2px;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .filter-btn:hover {
-            color: var(--text);
-            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--prod-text);
+            background: var(--prod-blue-light);
         }
 
         .filter-btn.active {
-            background: var(--text);
-            border-color: var(--text);
-            color: var(--bg);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            color: var(--prod-blue);
+            font-weight: 600;
+            background: var(--prod-blue-light);
         }
 
-        [data-theme="light"] .filter-btn.active {
-            background: #0f172a;
-            border-color: #0f172a;
-            color: #ffffff;
+        .filter-btn.active::after {
+            transform: translateX(-50%) scaleX(1);
         }
 
-        /* MODERN SEARCH BOX */
+        /* Search Box */
         .search-box {
             position: relative;
-            width: 320px;
+            width: 280px;
+            flex-shrink: 0;
         }
 
         @media (max-width: 768px) {
@@ -587,50 +172,109 @@
 
         .search-box input {
             width: 100%;
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            padding: 12px 20px 12px 42px;
-            color: var(--text);
+            background: var(--prod-bg);
+            border: 1px solid var(--prod-border);
+            border-radius: 8px;
+            padding: 10px 16px 10px 38px;
+            color: var(--prod-text);
             font-size: 13.5px;
-            font-family: var(--font-main);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: var(--font-body);
+            transition: all 0.2s ease;
             outline: none;
+            box-sizing: border-box;
         }
 
         .search-box input:focus {
-            border-color: var(--accent);
-            background: var(--bg);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+            border-color: var(--prod-blue);
+            background: var(--prod-surface);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-box input::placeholder {
+            color: var(--prod-subtle);
         }
 
         .search-box::before {
-            content: '🔍';
+            content: '';
             position: absolute;
-            left: 18px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--muted);
-            font-size: 13px;
-            opacity: 0.7;
+            width: 14px;
+            height: 14px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") no-repeat center;
+            background-size: contain;
+            font-size: 0;
         }
 
-        /* PREMIUM PRODUCTS GRID & BENTO CARDS */
+        /* ── PRODUCTS SECTION ─────────────────────────────── */
         .products-section {
-            padding: 40px 24px 100px;
-            background: var(--bg);
+            padding: 48px 24px 100px;
+            background: var(--prod-bg);
             min-height: 600px;
         }
 
+        /* Section heading */
+        .products-section-header {
+            max-width: 1240px;
+            margin: 0 auto 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .products-section-title {
+            font-family: var(--font-eng);
+            font-size: clamp(26px, 3.5vw, 36px);
+            font-weight: 700;
+            color: var(--prod-text);
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+            position: relative;
+        }
+
+        .products-section-title::after {
+            content: '';
+            display: block;
+            margin-top: 12px;
+            width: 40px;
+            height: 3px;
+            background: var(--prod-blue);
+            border-radius: 3px;
+            animation: lineGrow 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform-origin: left;
+        }
+
+        @keyframes lineGrow {
+            from {
+                transform: scaleX(0);
+            }
+
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        .products-section-subtitle {
+            font-family: var(--font-body);
+            font-size: 15px;
+            color: var(--prod-muted);
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 520px;
+        }
+
+        /* ── PRODUCT GRID ─────────────────────────────────── */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
+            gap: 24px;
             max-width: 1240px;
             margin: 0 auto;
         }
 
-        @media (max-width: 992px) {
+        @media (max-width: 1024px) {
             .products-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -642,143 +286,220 @@
             }
         }
 
+        /* ── PRODUCT CARD — INDUSTRIAL PREMIUM ────────────── */
+        /* ── PRODUCT CARD — INDUSTRIAL FLAGSHIP ───────────── */
         .product-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid var(--prod-border);
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.4s ease;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.01);
-            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        [data-theme="dark"] .product-card {
+            background: #0E1420;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
         }
 
         .product-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.03);
+            transform: translateY(-5px);
+            border-color: var(--prod-blue);
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
         }
 
+        [data-theme="dark"] .product-card:hover {
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(59, 130, 246, 0.08);
+        }
+
+        /* Image Container — dominates (60% coverage) */
         .product-img {
-            height: 240px;
+            aspect-ratio: 16/11;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background: var(--bg3);
+            background: #ffffff;
+            border-bottom: 1px solid var(--prod-border);
+        }
+
+        [data-theme="dark"] .product-img {
+            background: #0E1420;
         }
 
         .product-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: block;
         }
 
         .product-card:hover .product-img img {
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
+        /* Minimal Premium Category Badge */
         .product-tag {
             position: absolute;
-            top: 16px;
-            left: 16px;
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 10px;
+            top: 14px;
+            left: 14px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: var(--font-eng);
+            font-size: 9.5px;
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            backdrop-filter: blur(10px);
-            z-index: 2;
+            z-index: 3;
+            white-space: nowrap;
+            background: rgba(248, 250, 252, 0.9);
+            color: var(--prod-muted);
+            border: 1px solid var(--prod-border);
         }
 
-        .tag-blue { background: rgba(59, 130, 246, 0.08); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.15); }
-        .tag-purple { background: rgba(99, 102, 241, 0.08); color: var(--accent3); border: 1px solid rgba(99, 102, 241, 0.15); }
-        .tag-cyan { background: rgba(14, 165, 233, 0.08); color: var(--accent2); border: 1px solid rgba(14, 165, 233, 0.15); }
+        [data-theme="dark"] .product-tag {
+            background: rgba(8, 12, 20, 0.9);
+            color: #94A3B8;
+        }
 
+        /* Card Body (Increased Whitespace) */
         .product-body {
-            padding: 28px;
+            padding: 28px 28px 24px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
-            gap: 12px;
+            gap: 0;
         }
 
-        .product-body h3 {
-            font-family: var(--font-heading);
-            font-size: 19px;
+        /* Category Label */
+        .product-body-cat {
+            font-family: var(--font-eng);
+            font-size: 10px;
             font-weight: 700;
-            color: var(--text);
-            line-height: 1.3;
-            transition: color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--prod-blue);
+            margin-bottom: 6px;
+        }
+
+        /* Product Family Title */
+        .product-body h3 {
+            font-family: var(--font-eng);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--prod-text);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 3px;
+            transition: color 0.2s;
         }
 
         .product-card:hover .product-body h3 {
-            color: var(--accent);
+            color: var(--prod-blue);
         }
 
-        .product-body p {
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            flex-grow: 1;
+        /* Product Subtitle / Name */
+        .product-subtitle {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--prod-muted);
+            margin-bottom: 12px;
+            line-height: 1.3;
         }
 
-        .product-meta {
+        /* Short Engineering Statement */
+        .product-statement {
+            font-size: 12.5px;
+            color: var(--prod-subtle);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* Three Premium Specs Highlight Blocks */
+        .product-highlights-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--prod-border);
+            border-bottom: 1px solid var(--prod-border);
+            padding: 12px 0;
+            margin-bottom: 20px;
+            gap: 8px;
+        }
+
+        .product-highlight-block {
+            flex: 1;
+            text-align: center;
+        }
+
+        .product-highlight-block:not(:last-child) {
+            border-right: 1px solid var(--prod-border);
+        }
+
+        .product-highlight-value {
+            font-family: var(--font-eng);
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--prod-text);
+            margin-bottom: 2px;
+        }
+
+        .product-highlight-label {
+            font-size: 9.5px;
+            font-weight: 600;
+            color: var(--prod-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Card Footer - Minimal Action Button */
+        .product-meta {
+            display: flex;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 4px;
         }
 
         .product-link {
+            font-family: var(--font-eng);
             font-size: 13px;
-            font-weight: 600;
-            color: var(--accent2);
-            transition: transform 0.3s;
+            font-weight: 700;
+            color: var(--prod-blue) !important;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s ease;
         }
 
         .product-card:hover .product-link {
-            transform: translateX(4px);
+            transform: translateX(3px);
         }
 
+        .product-quote-btn {
+            display: none !important; /* Quote requested on detail page */
+        }
+
+        /* Remove old product-status (Active Enrollment etc.) */
         .product-status {
-            font-size: 11px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            display: none !important;
         }
 
-        .product-status::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-        .status-live { color: #25d366; }
-        .status-live::before { background: #25d366; box-shadow: 0 0 10px #25d366; }
-        .status-dev { color: #f59e0b; }
-        .status-dev::before { background: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
-
-        /* MODERN VERCEL MODAL SYSTEM */
+        /* ── MODAL — INDUSTRIAL PRODUCT DETAIL ───────────── */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(3, 5, 10, 0.85);
-            backdrop-filter: blur(20px);
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             z-index: 2000;
             display: none;
             align-items: center;
@@ -787,178 +508,1077 @@
             transition: all 0.3s;
         }
 
-        .modal-overlay.open { display: flex; }
+        .modal-overlay.open {
+            display: flex;
+        }
 
         .modal-content {
-            background: var(--bg2);
-            border: 1px solid var(--border);
+            background: var(--prod-surface);
+            border: 1px solid var(--prod-border);
             width: 100%;
-            max-width: 820px;
-            border-radius: 24px;
+            max-width: 860px;
+            border-radius: 12px;
             position: relative;
-            max-height: 90vh;
+            max-height: 92vh;
             overflow-y: auto;
-            padding: 48px;
-            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
-            animation: modalFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(20px);
+            padding: 36px 40px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+            animation: modalFade 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: var(--font-body);
+            box-sizing: border-box;
         }
 
-        @keyframes modalFade {
-            from { opacity: 0; transform: scale(0.96) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            color: var(--text);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            outline: none;
-        }
-
-        .modal-close:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
-
-        .modal-header h2 {
-            font-family: var(--font-heading);
-            font-size: clamp(24px, 4vw, 32px);
-            font-weight: 800;
-            margin-bottom: 20px;
-            color: var(--text);
-            letter-spacing: -0.02em;
-        }
-
-        .modal-body p {
-            color: var(--muted);
-            font-size: 15px;
-            line-height: 1.7;
-            margin-bottom: 28px;
-        }
-
-        .modal-section { margin-top: 36px; }
-        
-        .modal-section h4 {
-            font-family: var(--font-heading);
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--accent);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .modal-section h4::before {
-            content: '';
-            display: inline-block;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--accent);
-        }
-
-        .modal-features {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 640px) {
-            .modal-features {
-                grid-template-columns: 1fr;
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 24px 20px;
             }
         }
 
-        .modal-feature {
+        @keyframes modalFade {
+            from {
+                opacity: 0;
+                transform: scale(0.97) translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Top Bar Layout */
+        .modal-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--prod-border);
+        }
+
+        .modal-top-close {
+            background: transparent;
+            border: none;
+            color: var(--prod-text);
+            font-size: 26px;
+            font-weight: 300;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
             display: flex;
             align-items: center;
-            gap: 16px;
-            background: var(--card);
-            padding: 20px 24px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-
-        .modal-feature:hover {
-            transform: translateX(4px);
-            border-color: rgba(59, 130, 246, 0.2);
-        }
-
-        .modal-feature p {
-            font-size: 13.5px;
-            margin: 0;
-            color: var(--text);
-            font-weight: 500;
-        }
-
-        /* PRIMARY ACTION BUTTONS */
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #ffffff !important;
-            padding: 14px 32px;
-            border-radius: 10px;
-            font-size: 14.5px;
-            font-weight: 700;
-            letter-spacing: 0.2px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+            padding: 0;
+            line-height: 1;
             outline: none;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.35);
+        .modal-top-close:hover {
+            opacity: 1;
         }
 
-        /* GENERAL TOAST */
-        .toast {
-            position: fixed;
-            bottom: 32px;
-            right: 32px;
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 14px;
+        .modal-pdf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-eng);
+            font-size: 12px;
             font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+            color: var(--prod-blue);
+            background: var(--prod-blue-light);
+            border: 1px solid rgba(37, 99, 235, 0.15);
+            padding: 6px 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        [data-theme="dark"] .modal-pdf-btn {
+            color: #93C5FD;
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.15);
+        }
+
+        .modal-pdf-btn:hover {
+            background: var(--prod-blue);
+            color: #ffffff !important;
+            border-color: var(--prod-blue);
+        }
+
+        /* Main Image & Info Grid */
+        .modal-main-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 36px;
+            margin-bottom: 32px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .modal-main-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .modal-image-container {
+            border-radius: 8px;
+            overflow: hidden;
+            background: #F1F5F9;
+            border: 1px solid var(--prod-border);
+            aspect-ratio: 16/11;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        [data-theme="dark"] .modal-image-container {
+            background: #0D1322;
+        }
+
+        .modal-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: block;
+        }
+
+        .modal-image-container img:hover {
+            transform: scale(1.06);
+            cursor: zoom-in;
+        }
+
+        .modal-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-product-cat {
+            font-family: var(--font-eng);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--prod-blue);
+            margin-bottom: 6px;
+        }
+
+        .modal-product-title {
+            font-family: var(--font-eng);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--prod-text);
+            line-height: 1.15;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .modal-product-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-eng);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--prod-text);
+            background: var(--prod-bg);
+            border: 1px solid var(--prod-border);
+            padding: 5px 12px;
+            border-radius: 4px;
+            width: fit-content;
+            margin-bottom: 16px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .modal-product-badge span {
+            color: #F59E0B;
+            font-size: 12px;
+        }
+
+        .modal-product-desc {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--prod-muted);
+            margin: 0;
+        }
+
+        /* Specifications & Applications Grid */
+        .modal-specs-apps-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+            padding: 28px 0;
+            border-top: 1px solid var(--prod-border);
+            border-bottom: 1px solid var(--prod-border);
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 640px) {
+            .modal-specs-apps-grid {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+        }
+
+        .modal-section-title {
+            font-family: var(--font-eng);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--prod-text);
+            margin-bottom: 14px;
+        }
+
+        /* Specs Table Style */
+        .modal-specs-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .modal-specs-table tr {
+            border-bottom: 1px solid var(--prod-border);
+        }
+
+        .modal-specs-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .modal-specs-table td {
+            padding: 8px 0;
+            font-size: 13.5px;
+        }
+
+        .modal-specs-table td.spec-name {
+            color: var(--prod-muted);
+            font-weight: 500;
+            width: 40%;
+        }
+
+        .modal-specs-table td.spec-value {
+            color: var(--prod-text);
+            font-weight: 600;
+        }
+
+        /* Applications List Style */
+        .modal-apps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-app-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            color: var(--prod-text);
+            font-weight: 500;
+        }
+
+        .modal-app-item span {
+            color: var(--prod-blue);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Bottom Action Bar */
+        .modal-action-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+            .modal-action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .modal-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 24px;
+            border-radius: 6px;
+            font-family: var(--font-eng);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            box-sizing: border-box;
+        }
+
+        .modal-action-btn.primary {
+            background: var(--prod-blue);
+            color: #ffffff !important;
+            border: 1.5px solid var(--prod-blue);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .modal-action-btn.primary:hover {
+            background: #1D4ED8;
+            border-color: #1D4ED8;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+        }
+
+        .modal-action-btn.secondary {
+            background: transparent;
+            color: var(--prod-text) !important;
+            border: 1.5px solid var(--prod-border);
+        }
+
+        .modal-action-btn.secondary:hover {
+            border-color: var(--prod-border-hover);
+            background: var(--prod-blue-light);
+            color: var(--prod-blue) !important;
+            transform: translateY(-1px);
+        }
+            color: var(--prod-text);
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-family: var(--font-eng);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--prod-shadow-hover);
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 2000;
+            z-index: 3000;
         }
 
         .toast.show {
             transform: translateY(0);
             opacity: 1;
         }
+
+        /* ── FADE-IN FOR CARDS ────────────────────────────── */
+        @keyframes cardFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card.visible {
+            animation: cardFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        /* No Results */
+        #noResults h3 {
+            font-family: var(--font-eng);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--prod-text);
+        }
+
+        /* =============================================
+           IMMERSIVE PRODUCT DETAIL PAGE STYLE
+           ============================================= */
+        .product-detail-view {
+            background: #ffffff;
+            color: #0F172A;
+            min-height: 100vh;
+            position: relative;
+            z-index: 100;
+            padding-bottom: 80px;
+        }
+
+        [data-theme="dark"] .product-detail-view {
+            background: #080C14;
+            color: #F1F5F9;
+        }
+
+        /* Sticky Detail Navigation */
+        .detail-nav {
+            position: sticky;
+            top: 70px;
+            z-index: 990;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--prod-border);
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+        }
+
+        [data-theme="dark"] .detail-nav {
+            background: rgba(8, 12, 20, 0.85);
+        }
+
+        .detail-nav-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .detail-nav-title {
+            font-family: var(--font-eng);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--prod-text);
+        }
+
+        .detail-nav-sep {
+            width: 1px;
+            height: 16px;
+            background: var(--prod-border);
+        }
+
+        .detail-nav-cat {
+            font-family: var(--font-eng);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--prod-muted);
+        }
+
+        .detail-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .detail-nav-links { display: none; }
+        }
+
+        .detail-nav-link {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--prod-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .detail-nav-link:hover {
+            color: var(--prod-blue);
+        }
+
+        .detail-nav-close {
+            font-family: var(--font-eng);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--prod-text);
+            border: 1px solid var(--prod-border);
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-nav-close:hover {
+            background: var(--prod-blue-light);
+            border-color: var(--prod-blue);
+            color: var(--prod-blue);
+        }
+
+        /* Hero Layout - Two Column */
+        .detail-hero {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 80px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        @media (max-width: 992px) {
+            .detail-hero {
+                grid-template-columns: 1fr;
+                gap: 48px;
+                padding: 40px 24px;
+            }
+        }
+
+        .detail-hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .detail-brand-tag {
+            font-family: var(--font-eng);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--prod-muted);
+            margin-bottom: 8px;
+        }
+
+        .detail-hero-title {
+            font-family: var(--font-eng);
+            font-size: clamp(38px, 5.5vw, 68px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.04em;
+            color: var(--prod-text);
+            margin-bottom: 4px;
+        }
+
+        .detail-hero-subtitle {
+            font-family: var(--font-eng);
+            font-size: clamp(14px, 2vw, 17px);
+            font-weight: 600;
+            color: var(--prod-muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .detail-hero-headline {
+            font-family: var(--font-body);
+            font-size: clamp(20px, 3.2vw, 30px);
+            font-weight: 700;
+            color: var(--prod-text);
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            margin-bottom: 28px;
+            max-width: 580px;
+        }
+
+        .detail-mini-highlights {
+            font-family: var(--font-eng);
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--prod-muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 36px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .detail-mini-highlights span.stars {
+            color: #F59E0B;
+        }
+
+        .detail-hero-desc {
+            display: none; /* Removed huge paragraphs from hero */
+        }
+
+        .detail-hero-actions {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .detail-hero-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+        }
+
+        /* Image Gallery System */
+        .detail-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-image-viewer {
+            position: relative;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .detail-image-viewer img {
+            width: 100%;
+            height: auto;
+            max-height: 480px;
+            object-fit: contain;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.08));
+        }
+
+        [data-theme="dark"] .detail-image-viewer img {
+            filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.45)) drop-shadow(0 4px 12px rgba(59, 130, 246, 0.06));
+        }
+
+        /* Ambient glow backing for high-tech premium feel */
+        .detail-image-viewer::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+            z-index: -1;
+            top: 10%;
+            left: 10%;
+            pointer-events: none;
+        }
+
+        [data-theme="dark"] .detail-image-viewer::before {
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+        }
+
+        .detail-image-viewer.zoomed img {
+            transform: scale(1.4);
+            cursor: zoom-out;
+        }
+
+        .detail-image-viewer:not(.zoomed) img:hover {
+            cursor: zoom-in;
+        }
+
+
+
+        /* Technical Highlights Section */
+        .detail-highlights-wrap {
+            background: var(--prod-bg);
+            border-top: 1px solid var(--prod-border);
+            border-bottom: 1px solid var(--prod-border);
+            padding: 60px 24px;
+        }
+
+        .detail-section-container {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        .detail-section-title-wrap {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .detail-section-title-wrap h3 {
+            font-family: var(--font-eng);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--prod-text);
+            letter-spacing: -0.02em;
+        }
+
+        .detail-section-title-wrap p {
+            font-size: 15px;
+            color: var(--prod-muted);
+            margin-top: 8px;
+        }
+
+        .detail-highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .detail-highlight-card {
+            background: var(--prod-surface);
+            border: 1px solid var(--prod-border);
+            border-radius: 8px;
+            padding: 28px 24px;
+            text-align: center;
+            box-shadow: var(--prod-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .detail-highlight-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--prod-shadow-hover);
+        }
+
+        .detail-highlight-value {
+            font-family: var(--font-eng);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--prod-blue);
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .detail-highlight-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--prod-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Detailed Specifications Grid */
+        .detail-specs-section {
+            padding: 80px 24px;
+        }
+
+        .detail-specs-groups {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+        }
+
+        @media (max-width: 992px) {
+            .detail-specs-groups {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-spec-group-card {
+            background: #ffffff;
+            border: 1px solid var(--prod-border);
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: var(--prod-shadow);
+        }
+
+        [data-theme="dark"] .detail-spec-group-card {
+            background: #0E1420;
+        }
+
+        .detail-spec-group-title {
+            font-family: var(--font-eng);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--prod-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1.5px solid var(--prod-blue);
+            width: fit-content;
+        }
+
+        .detail-spec-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .detail-spec-table tr {
+            border-bottom: 1px solid var(--prod-border);
+        }
+
+        .detail-spec-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .detail-spec-table td {
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .detail-spec-table td.label {
+            color: var(--prod-muted);
+            width: 45%;
+            font-weight: 500;
+        }
+
+        .detail-spec-table td.value {
+            color: var(--prod-text);
+            font-weight: 600;
+        }
+
+        /* Applications Grid Section */
+        .detail-apps-section {
+            background: var(--prod-bg);
+            padding: 80px 24px;
+            border-top: 1px solid var(--prod-border);
+            border-bottom: 1px solid var(--prod-border);
+        }
+
+        .detail-apps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .detail-apps-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .detail-apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-app-card {
+            background: var(--prod-surface);
+            border: 1px solid var(--prod-border);
+            border-radius: 8px;
+            padding: 32px 28px;
+            box-shadow: var(--prod-shadow);
+            transition: all 0.2s ease;
+        }
+
+        .detail-app-card:hover {
+            border-color: var(--prod-border-hover);
+            transform: translateY(-4px);
+        }
+
+        .detail-app-card-icon {
+            color: var(--prod-blue);
+            font-size: 22px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .detail-app-card-title {
+            font-family: var(--font-eng);
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--prod-text);
+            margin-bottom: 10px;
+        }
+
+        .detail-app-card-desc {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: var(--prod-muted);
+        }
+
+        /* Download Center */
+        .detail-downloads-section {
+            padding: 80px 24px;
+        }
+
+        .detail-downloads-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .detail-downloads-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .detail-downloads-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-download-card {
+            border: 1px solid var(--prod-border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 120px;
+            transition: all 0.25s;
+            cursor: pointer;
+            background: #ffffff;
+            box-shadow: var(--prod-shadow);
+        }
+
+        [data-theme="dark"] .detail-download-card {
+            background: #0E1420;
+        }
+
+        .detail-download-card:hover {
+            border-color: var(--prod-border-hover);
+            transform: translateY(-2px);
+        }
+
+        .detail-download-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .detail-download-icon {
+            font-size: 18px;
+            color: var(--prod-blue);
+            margin-top: 2px;
+        }
+
+        .detail-download-name {
+            font-family: var(--font-eng);
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--prod-text);
+        }
+
+        .detail-download-meta {
+            font-size: 11px;
+            color: var(--prod-muted);
+            margin-top: 4px;
+        }
+
+        .detail-download-action {
+            align-self: flex-end;
+            font-family: var(--font-eng);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--prod-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Quote Form Section */
+        .detail-quote-section {
+            background: var(--prod-bg);
+            border-top: 1px solid var(--prod-border);
+            border-bottom: 1px solid var(--prod-border);
+            padding: 80px 24px;
+        }
+
+        .detail-quote-container {
+            max-width: 680px;
+            margin: 0 auto;
+            background: var(--prod-surface);
+            border: 1px solid var(--prod-border);
+            border-radius: 12px;
+            padding: 48px;
+            box-shadow: var(--prod-shadow);
+        }
+
+        @media (max-width: 640px) {
+            .detail-quote-container {
+                padding: 28px 20px;
+            }
+        }
+
+        .detail-quote-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 28px;
+        }
+
+        @media (max-width: 640px) {
+            .detail-quote-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .detail-form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-form-label {
+            font-family: var(--font-eng);
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--prod-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-form-input {
+            width: 100%;
+            background: var(--prod-bg);
+            border: 1px solid var(--prod-border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: var(--prod-text);
+            font-family: var(--font-body);
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .detail-form-input:focus {
+            border-color: var(--prod-blue);
+            background: var(--prod-surface);
+        }
+
+        .detail-form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .detail-form-submit {
+            grid-column: 1 / -1;
+            margin-top: 10px;
+        }
+
+        /* Related Products Area */
+        .detail-related-section {
+            padding: 80px 24px 40px;
+        }
+
+        .detail-related-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .detail-related-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .detail-related-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Quick animations */
+        .fade-in-up-anim {
+            opacity: 0;
+            transform: translateY(24px);
+            animation: fup 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fup {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
-    
-                <nav id="navbar">
+
+    <nav id="navbar">
         <div class="nav-inner">
             <a href="index.html" class="logo">
                 <img src="assets/ruf/main 1 rem.png" class="logo-icon"
@@ -1007,121 +1627,29 @@
             <a href="contact.html">Contact</a>
         </div>
     </nav>
-    
-    <!-- Updates Strip Ticker -->
-    <div class="updates-ticker-wrap">
-        <div class="updates-label">UPDATES</div>
-        <div class="ticker-content-container">
-            <div class="ticker-track">
-                <span>Industry-Academia Conclave 2026 — VTU Regional Center Bengaluru</span>
-                <span>•</span>
-                <span>Smart Power Hub Training — Starting May 2026</span>
-                <span>•</span>
-                <span>VLSI Design & Verilog Bootcamp — Applications Open</span>
-                <span>•</span>
-                <span>Core Tech Placement Drive 2026 — Join Now</span>
-                <span>•</span>
-                <span>Industry-Academia Conclave 2026 — VTU Regional Center Bengaluru</span>
-                <span>•</span>
-                <span>Smart Power Hub Training — Starting May 2026</span>
-                <span>•</span>
-                <span>VLSI Design & Verilog Bootcamp — Applications Open</span>
-                <span>•</span>
-                <span>Core Tech Placement Drive 2026 — Join Now</span>
-            </div>
-        </div>
-    </div>
 
-    
+
+
 
     <div class="page-hero">
-        <!-- Floating Blurs -->
-        <div class="hero-blur blur-1"></div>
-        <div class="hero-blur blur-2"></div>
-        
         <div class="page-hero-inner">
-            <!-- Breadcrumb & Announcement Badge -->
-            <div class="breadcrumb reveal"><a href="index.html">Home</a> › <span>Skill Tracks</span></div>
-            <div class="announcement-badge reveal">
-                <span class="badge-new">New</span>
-                <span class="badge-text">✨ Introducing Deep-Tech Workspace 2.0</span>
-            </div>
-            
-            <!-- Large Headline & Subtitle -->
-            <h1 class="reveal" id="prodHeroTitle">Professional Skill Tracks<br>Designed for <span>Real Careers</span></h1>
-            <p class="hero-subtitle reveal">
-                Deploy production-grade engineering workflows and hardware mastery on a world-class training infrastructure designed for modern technology leaders.
-            </p>
-            
-            <!-- CTA Action Hub -->
-            <div class="hero-ctas reveal">
-                <a href="contact.html" class="btn-saas-primary">Apply for Track →</a>
-                <a href="#productsGrid" class="btn-saas-secondary">Explore Tracks</a>
-            </div>
-            
-            <!-- Trusted Metrics Row -->
-            <div class="hero-stats-row reveal">
-                <div class="stat-item">
-                    <span class="stat-number">10K+</span>
-                    <span class="stat-label">Engineers Trained</span>
-                </div>
-                <div class="stat-sep"></div>
-                <div class="stat-item">
-                    <span class="stat-number">VTU-TCOE</span>
-                    <span class="stat-label">Regional Incubation</span>
-                </div>
-                <div class="stat-sep"></div>
-                <div class="stat-item">
-                    <span class="stat-number">100%</span>
-                    <span class="stat-label">Core Placements</span>
-                </div>
-            </div>
-
-            <!-- Premium Interactive UI Dashboard Mockup -->
-            <div class="hero-mockup reveal">
-                <div class="mockup-header">
-                    <div class="mockup-dots">
-                        <span class="dot-red"></span>
-                        <span class="dot-yellow"></span>
-                        <span class="dot-green"></span>
-                    </div>
-                </div>
-                <div class="mockup-body">
-                    <div class="mockup-sidebar">
-                        <div class="sidebar-item active" onclick="switchMockupTab('electronics')">⚡ Power Electronics</div>
-                        <div class="sidebar-item" onclick="switchMockupTab('ai')">🧠 Industrial AI</div>
-                        <div class="sidebar-item" onclick="switchMockupTab('iot')">📡 IoT & Robotics</div>
-                    </div>
-                    <div class="mockup-content" id="mockupContentArea">
-                        <div class="code-editor">
-                            <span class="code-line"><span class="c-keyword">import</span> smps_control <span class="c-keyword">as</span> control</span>
-                            <span class="code-line"><span class="c-keyword">sys</span> = control.InitializeSystem(voltage=400, frequency=50)</span>
-                            <span class="code-line"><span class="c-keyword">sys</span>.optimize_efficiency(threshold=0.985)</span>
-                            <span class="code-line"><span class="c-comment"># Status: Operational (98.6% efficiency achieved)</span></span>
-                        </div>
-                        <div class="mockup-telemetry">
-                            <div class="telemetry-card">
-                                <span class="tel-label">SYSTEM EFFICIENCY</span>
-                                <span class="tel-value" style="color: var(--accent);">98.62%</span>
-                            </div>
-                            <div class="telemetry-card">
-                                <span class="tel-label">GRID FREQUENCY</span>
-                                <span class="tel-value" style="color: var(--accent);">50.02 Hz</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="breadcrumb reveal"><a href="index.html">Home</a> › <span>Products</span></div>
+            <h1 class="reveal" id="prodHeroTitle">Our <span>Products</span></h1>
+            <p class="reveal">Powering global industries with high-performance EV charging solutions, custom battery management systems, and precision power electronics.</p>
         </div>
     </div>
 
     <div class="products-filter">
         <div class="filter-inner">
             <div class="filter-groups reveal">
-                <button class="filter-btn active" id="btnCatAll" onclick="filterProducts('all', this)">All Tracks</button>
-                <button class="filter-btn" id="btnCatHardware" onclick="filterProducts('hardware', this)">Hardware & Power</button>
-                <button class="filter-btn" id="btnCatAiSoftware" onclick="filterProducts('ai-software', this)">AI & Software</button>
-                <button class="filter-btn" id="btnCatIot" onclick="filterProducts('iot', this)">IoT & Robotics</button>
+                <button class="filter-btn active" id="btnCatAll" onclick="filterProducts('all', this)">All
+                    Products</button>
+                <button class="filter-btn" id="btnCatHardware" onclick="filterProducts('hardware', this)">Power &amp;
+                    Hardware</button>
+                <button class="filter-btn" id="btnCatAiSoftware" onclick="filterProducts('ai-software', this)">AI &amp;
+                    Software</button>
+                <button class="filter-btn" id="btnCatIot" onclick="filterProducts('iot', this)">IoT &amp;
+                    Automation</button>
             </div>
             <div class="search-box reveal">
                 <input type="text" id="searchInput" placeholder="Search products..." onkeyup="searchProducts()">
@@ -1130,23 +1658,27 @@
     </div>
 
     <section class="products-section">
+        <!-- Section Header -->
+        <div class="products-section-header">
+            <h2 class="products-section-title">Product Catalogue</h2>
+            <p class="products-section-subtitle">Engineered for industrial reliability, smart control, and peak
+                performance across energy, automation, and power sectors.</p>
+        </div>
+
         <div class="products-grid" id="productsGrid">
             <!-- Products will be rendered here -->
         </div>
-        <div id="noResults" style="display:none; text-align:center; padding:100px 0; color:var(--muted);">
+        <div id="noResults" style="display:none; text-align:center; padding:100px 0; color:var(--prod-muted);">
             <h3>No products found matching your search.</h3>
         </div>
     </section>
 
+    <!-- IMMERSIVE PRODUCT DETAIL PAGE CONTAINER -->
+    <div id="productDetailContainer" style="display: none;"></div>
+
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModalBtn()">×</button>
-            <div class="modal-header">
-                <h2 id="modalTitle">Product Name</h2>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Content injected here -->
-            </div>
+        <div class="modal-content" id="modalContent">
+            <!-- Dynamically injected by JavaScript -->
         </div>
     </div>
 
@@ -1229,7 +1761,7 @@
         </div>
     </footer>
 
-    
+
 
     <script>
         const defaultBackendPort = '5002';
@@ -1237,10 +1769,38 @@
             ? `http://127.0.0.1:${defaultBackendPort}`
             : '';
 
+        // ─── Apply Cached Page Settings Synchronously (Prevents Flash/Delay) ─────
+        (function applyCachedSettings() {
+            try {
+                const cached = localStorage.getItem('smps_products_settings_cache');
+                if (cached) {
+                    const d = JSON.parse(cached);
+                    if (d) {
+                        const heroEl = document.getElementById('prodHeroTitle');
+                        if (heroEl && d.heroTitle) {
+                            heroEl.innerHTML = d.heroTitle;
+                        }
+                        const catMap = {
+                            btnCatAll: d.catAll,
+                            btnCatHardware: d.catHardware,
+                            btnCatAiSoftware: d.catAiSoftware,
+                            btnCatIot: d.catIot
+                        };
+                        Object.entries(catMap).forEach(([id, label]) => {
+                            const btn = document.getElementById(id);
+                            if (btn && label) btn.textContent = label;
+                        });
+                    }
+                }
+            } catch (e) {
+                console.warn('Error applying cached settings:', e);
+            }
+        })();
+
         // ─── Theme ───────────────────────────────────────────────────────────
         const htmlElement = document.documentElement;
         const themeToggle = document.getElementById('themeToggle');
-        const themeIcon   = document.getElementById('themeIcon');
+        const themeIcon = document.getElementById('themeIcon');
 
         function updateIcon(theme) {
             if (!themeIcon) return;
@@ -1268,7 +1828,7 @@
         // ─── Image Error Resolver Helper ──────────────────────────────────────
         function handleImageError(imgEl, originalUrl) {
             const defaultImg = 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800';
-            
+
             // Prevent infinite loop if fallback fails
             if (imgEl.dataset.fallbackTriggered) {
                 imgEl.src = defaultImg;
@@ -1323,6 +1883,13 @@
 
             if (!d || !Object.keys(d).length) return;
 
+            // Cache settings to localStorage to prevent layout flashes on next refresh
+            try {
+                localStorage.setItem('smps_products_settings_cache', JSON.stringify(d));
+            } catch (e) {
+                console.warn('Could not cache products settings in localStorage:', e);
+            }
+
             // Hero title
             const heroEl = document.getElementById('prodHeroTitle');
             if (heroEl && d.heroTitle) {
@@ -1330,10 +1897,10 @@
             }
             // Category filter button labels
             const catMap = {
-                btnCatAll:        d.catAll,
-                btnCatHardware:   d.catHardware,
+                btnCatAll: d.catAll,
+                btnCatHardware: d.catHardware,
                 btnCatAiSoftware: d.catAiSoftware,
-                btnCatIot:        d.catIot
+                btnCatIot: d.catIot
             };
             Object.entries(catMap).forEach(([id, label]) => {
                 const btn = document.getElementById(id);
@@ -1370,11 +1937,11 @@
 
         let currentFilter = 'all';
         let currentSearch = '';
-        let _allProducts  = [];   // cached so modal can look up without another fetch
+        let _allProducts = [];   // cached so modal can look up without another fetch
 
         // ─── Render product cards ─────────────────────────────────────────────
         function buildCards(products) {
-            const grid        = document.getElementById('productsGrid');
+            const grid = document.getElementById('productsGrid');
             const noResultsEl = document.getElementById('noResults');
 
             const filtered = products.filter(p => {
@@ -1397,27 +1964,96 @@
                     : '<h3>No products found matching your search.</h3>';
             } else {
                 noResultsEl.style.display = 'none';
-                grid.innerHTML = filtered.map((p, i) => `
-                    <div class="product-card reveal" onclick="openModal('${p.id}')" style="animation-delay:${i * 0.08}s">
+                grid.innerHTML = filtered.map((p, i) => {
+                    // Split out flagship brand name from parentheses if present
+                    let rawName = p.name || '';
+                    let mainName = rawName;
+                    let modelName = '';
+                    if (rawName.includes('(')) {
+                        let parts = rawName.split('(');
+                        modelName = parts[0].trim();
+                        mainName = parts[1].replace(')', '').trim();
+                    } else if (rawName.includes('—')) {
+                        let parts = rawName.split('—');
+                        modelName = parts[0].trim();
+                        mainName = parts[1].trim();
+                    }
+
+                    // Determine premium category badge
+                    const lowerName = rawName.toLowerCase();
+                    const tagKey = p.tag || 'hardware';
+                    let categoryBadge = "Power Electronics";
+                    if (tagKey === 'hardware' || lowerName.includes('power') || lowerName.includes('charge')) {
+                        categoryBadge = "EV Infrastructure";
+                    } else if (tagKey === 'ai-software' || lowerName.includes('ai') || lowerName.includes('software')) {
+                        categoryBadge = "Industrial AI";
+                    } else if (tagKey === 'iiot' || lowerName.includes('iot') || lowerName.includes('automation')) {
+                        categoryBadge = "Industrial Automation";
+                    }
+
+                    // Short engineering statement
+                    let engineeringStatement = p.desc || 'Next-generation critical power infrastructure.';
+                    if (engineeringStatement.length > 80) {
+                        engineeringStatement = engineeringStatement.split('.')[0] + '.';
+                    }
+
+                    // Determine 3 premium highlight blocks
+                    let highlights = [];
+                    if (tagKey === 'hardware' || lowerName.includes('power') || lowerName.includes('charge')) {
+                        highlights = [
+                            { val: "22kW", lbl: "Power" },
+                            { val: "IP65", lbl: "Protection" },
+                            { val: "CE", lbl: "Certified" }
+                        ];
+                    } else if (tagKey === 'ai-software' || lowerName.includes('ai') || lowerName.includes('software')) {
+                        highlights = [
+                            { val: "< 5ms", lbl: "Latency" },
+                            { val: "99.8%", lbl: "Accuracy" },
+                            { val: "CUDA", lbl: "Accel" }
+                        ];
+                    } else {
+                        highlights = [
+                            { val: "MQTT", lbl: "Protocol" },
+                            { val: "ARM M4", lbl: "Core" },
+                            { val: "IP67", lbl: "Enclosure" }
+                        ];
+                    }
+
+                    const highlightsHtml = `
+                        <div class="product-highlights-row">
+                            ${highlights.map(h => `
+                                <div class="product-highlight-block">
+                                    <div class="product-highlight-value">${h.val}</div>
+                                    <div class="product-highlight-label">${h.lbl}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                    return `
+                    <div class="product-card" onclick="openModal('${p.id}')" style="animation-delay:${i * 0.08}s" role="article" tabindex="0" aria-label="${p.name}">
                         <div class="product-img">
                             <img src="${p.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'}"
                                  alt="${p.name}"
+                                 loading="lazy"
                                  onerror="handleImageError(this, '${p.img}')">
-                            <span class="product-tag ${p.tagClass || 'tag-blue'}">${p.tagLabel || (p.tag || 'Product').toUpperCase()}</span>
+                            <span class="product-tag">${categoryBadge}</span>
                         </div>
                         <div class="product-body">
-                            <h3>${p.name}</h3>
-                            <p>${p.desc || ''}</p>
+                            <div class="product-body-cat">${categoryBadge}</div>
+                            <h3>${mainName}</h3>
+                            <div class="product-subtitle">${modelName || 'Enterprise Class'}</div>
+                            <p class="product-statement">${engineeringStatement}</p>
+                            
+                            ${highlightsHtml}
+                            
                             <div class="product-meta">
-                                <span class="product-link">View Details →</span>
-                                <span class="product-status ${p.status === 'Live' || p.status === 'live' ? 'status-live' : 'status-dev'}">
-                                    ${p.statusLabel || p.status || ''}
-                                </span>
+                                <span class="product-link">View Product &rarr;</span>
                             </div>
                         </div>
-                    </div>
-                `).join('');
-                grid.querySelectorAll('.reveal').forEach(el => obs2.observe(el));
+                    </div>`;
+                }).join('');
+                grid.querySelectorAll('.product-card').forEach(el => obs2.observe(el));
             }
         }
 
@@ -1432,6 +2068,9 @@
 
             _allProducts = await getProducts();
             buildCards(_allProducts);
+            
+            // Trigger routing on load in case deep link is present
+            handleRouting();
         }
 
         const obs2 = new IntersectionObserver(e => e.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); }), { threshold: .1 });
@@ -1449,12 +2088,71 @@
             buildCards(_allProducts);
         }
 
-        // ─── Product detail modal ─────────────────────────────────────────────
-        function openModal(id) {
-            const p = _allProducts.find(x => String(x.id) === String(id));
-            if (!p) return;
+        // ─── Immersive Product Details Routing & Rendering ──────────────────
+        window.addEventListener('hashchange', handleRouting);
 
-            document.getElementById('modalTitle').textContent = p.name;
+        async function handleRouting() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#product-')) {
+                const id = hash.replace('#product-', '');
+                
+                // Ensure products are loaded first
+                if (!_allProducts || _allProducts.length === 0) {
+                    _allProducts = await getProducts();
+                }
+                
+                showProductDetailView(id);
+            } else {
+                showProductGridView();
+            }
+        }
+
+        function showProductGridView() {
+            // Hide detail view container
+            const detailContainer = document.getElementById('productDetailContainer');
+            if (detailContainer) {
+                detailContainer.style.display = 'none';
+                detailContainer.innerHTML = '';
+            }
+
+            // Restore catalog sections
+            const hero = document.querySelector('.page-hero');
+            const filterBar = document.querySelector('.products-filter');
+            const productsSec = document.querySelector('.products-section');
+            const ticker = document.querySelector('.updates-ticker-wrap');
+
+            if (hero) hero.style.display = 'flex';
+            if (filterBar) filterBar.style.display = 'block';
+            if (productsSec) productsSec.style.display = 'block';
+            if (ticker) ticker.style.display = 'block';
+
+            document.body.style.overflow = '';
+        }
+
+        function showProductDetailView(id) {
+            const p = _allProducts.find(x => String(x.id) === String(id));
+            if (!p) {
+                // If not found, return to grid
+                window.location.hash = '';
+                return;
+            }
+
+            // Hide catalog sections to make the product detail standalone
+            const hero = document.querySelector('.page-hero');
+            const filterBar = document.querySelector('.products-filter');
+            const productsSec = document.querySelector('.products-section');
+            const ticker = document.querySelector('.updates-ticker-wrap');
+
+            if (hero) hero.style.display = 'none';
+            if (filterBar) filterBar.style.display = 'none';
+            if (productsSec) productsSec.style.display = 'none';
+            if (ticker) ticker.style.display = 'none';
+
+            const detailContainer = document.getElementById('productDetailContainer');
+            if (!detailContainer) return;
+
+            detailContainer.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'instant' });
 
             let featureList = [];
             if (p.features) {
@@ -1465,34 +2163,468 @@
                 }
             }
 
-            document.getElementById('modalBody').innerHTML = `
-                <div>
-                    <img src="${p.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'}"
-                         alt="${p.name}"
-                         style="width:100%;border-radius:16px;margin-bottom:24px;max-height:280px;object-fit:cover;"
-                         onerror="handleImageError(this, '${p.img}')">
-                </div>
-                <div class="modal-section">
-                    <h4>Overview</h4>
-                    <p>${p.fullDesc || p.desc || ''}</p>
-                </div>
-                ${featureList.length ? `
-                <div class="modal-section">
-                    <h4>Key Features</h4>
-                    <div class="modal-features">
-                        ${featureList.map(f => `<div class="modal-feature"><span>✓</span><p>${f}</p></div>`).join('')}
+            // Parse flagship brand name from parentheses if present (e.g. SARALA-EVC-2500W (SmartAMP™))
+            let rawName = p.name || '';
+            let mainName = rawName;
+            let modelName = '';
+            if (rawName.includes('(')) {
+                let parts = rawName.split('(');
+                modelName = parts[0].trim();
+                mainName = parts[1].replace(')', '').trim();
+            } else if (rawName.includes('—')) {
+                let parts = rawName.split('—');
+                modelName = parts[0].trim();
+                mainName = parts[1].trim();
+            }
+
+            const lowerNameTag = (p.name || '').toLowerCase();
+            const tagKey = p.tag || 'hardware';
+            const categoryLabel = p.tagLabel || (p.tag === 'hardware' ? 'Power & EV Charging' : p.tag === 'ai-software' ? 'Industrial AI' : 'IIoT & Robotics');
+
+            // Determine dynamic engineering headlines based on product type
+            let engineeringHeadline = "Precision Engineering Built for Industrial Scale.";
+            if (tagKey === 'hardware' || lowerNameTag.includes('power') || lowerNameTag.includes('charge')) {
+                engineeringHeadline = "Precision Charging for Mission-Critical Applications";
+            } else if (tagKey === 'ai-software' || lowerNameTag.includes('ai') || lowerNameTag.includes('software')) {
+                engineeringHeadline = "Precision Control. Redefined by Machine Learning.";
+            } else {
+                engineeringHeadline = "Mission-Critical Telemetry. Built for Global Scale.";
+            }
+            
+            let tagline = "★ Premium Industrial Technology";
+            let highlightSpecs = [];
+            let specsElectrical = {};
+            let specsMechanical = {};
+            let specsEnvironmental = {};
+            let specsCompliance = {};
+            let apps = [];
+
+            const mainImg = p.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800';
+
+            if (tagKey === 'hardware' || lowerNameTag.includes('power') || lowerNameTag.includes('charge')) {
+                tagline = "★ Certified Commercial Infrastructure Grade";
+                highlightSpecs = [
+                    { value: "22 kW", label: "Max Power Output" },
+                    { value: "IP65", label: "Protection Rating" },
+                    { value: "415 V", label: "Nominal Voltage" },
+                    { value: "CE", label: "Safety Certified" },
+                    { value: "IEC", label: "Grid Standard" },
+                    { value: "5 Years", label: "Enterprise Warranty" }
+                ];
+                specsElectrical = {
+                    "Input Voltage": "380-450V AC, 3-Phase",
+                    "Frequency": "50/60 Hz",
+                    "Max Current": "32A per phase",
+                    "Standby Power": "< 5 Watts",
+                    "Power Factor": "> 0.98 at full load"
+                };
+                specsMechanical = {
+                    "Dimensions": "420mm x 280mm x 150mm",
+                    "Weight": "8.5 kg",
+                    "Enclosure Material": "Polycarbonate, UV resistant",
+                    "Cable Length": "5 Meters standard",
+                    "Mounting Options": "Wall mount / Pedestal stand"
+                };
+                specsEnvironmental = {
+                    "Operating Temperature": "-35°C to +55°C",
+                    "Storage Temperature": "-40°C to +70°C",
+                    "Operating Humidity": "5% to 95% non-condensing",
+                    "Max Operating Altitude": "2000m",
+                    "Cooling System": "Natural convection air cooling"
+                };
+                specsCompliance = {
+                    "Certification Standards": "CE, IEC 61851-1, IEC 62196-2",
+                    "Safety Protections": "Overcurrent, Short Circuit, Ground Fault",
+                    "IP & IK Rating": "IP65 Waterproof / IK10 Impact",
+                    "RCD Protection": "Built-in 6mA DC leakage protection"
+                };
+                apps = [
+                    { title: "Public Fast Charging", desc: "Optimized for continuous, high-duty cycles at highway rest stops and parking networks.", icon: "⚡" },
+                    { title: "Commercial Hubs", desc: "Seamless billing integration for retail centers, offices, and fleet operational centers.", icon: "🏢" },
+                    { title: "Industrial Parks", desc: "Designed to tolerate voltage fluctuations and harsh environmental debris on factory campus grounds.", icon: "🏭" }
+                ];
+            } else if (tagKey === 'ai-software' || lowerNameTag.includes('ai') || lowerNameTag.includes('software')) {
+                tagline = "★ Enterprise Predictive AI Integration";
+                highlightSpecs = [
+                    { value: "< 5 ms", label: "Edge Inference Latency" },
+                    { value: "99.8%", label: "Detection Accuracy" },
+                    { value: "CUDA/RTX", label: "Hardware Acceleration" },
+                    { value: "gRPC/API", label: "Control Interfaces" },
+                    { value: "SOC 2", label: "Compliance Standard" },
+                    { value: "Linux", label: "Native OS Support" }
+                ];
+                specsElectrical = {
+                    "API Latency": "< 4.2ms avg",
+                    "Throughput": "10,000 telemetry packets/sec",
+                    "Model Format": "ONNX, TensorRT optimized",
+                    "Host Interface": "gRPC, WebSocket, MQTT",
+                    "Security Level": "AES-256 encrypted payload"
+                };
+                specsMechanical = {
+                    "RAM Requirements": "8 GB minimum (16 GB recommended)",
+                    "GPU Optimization": "NVIDIA Jetson / RTX Server",
+                    "Storage Footprint": "500 MB edge container size",
+                    "Virtualization": "Docker, Kubernetes compatible",
+                    "Integration Method": "REST / JSON Webhook SDK"
+                };
+                specsEnvironmental = {
+                    "PLC Support": "Siemens S7, Modbus TCP, OPC UA",
+                    "Data Retention": "Local edge buffer up to 48 hours",
+                    "Failover Mode": "Hot standby redundant failover",
+                    "Network Dependency": "Offline-first edge operation capable"
+                };
+                specsCompliance = {
+                    "Standards": "ISO/IEC 22989 AI Ethics, GDPR Compliant",
+                    "Data Privacy": "On-prem local processing standard",
+                    "SOC Certification": "SOC 2 Type II Certified Pipeline",
+                    "Reliability Rating": "99.99% system availability SLA"
+                };
+                apps = [
+                    { title: "Predictive Maintenance", desc: "Analyzes high-frequency vibration and heat logs to forecast machine failures before downtime occurs.", icon: "⚙️" },
+                    { title: "Quality Control Vision", desc: "Edge neural network analyzing live optical streams for microscopic surface defects in real-time.", icon: "👁️" },
+                    { title: "Smart Grid Optimization", desc: "Algorithms analyzing load spikes and generating microgrid routing directives to maximize battery efficiency.", icon: "📊" }
+                ];
+            } else {
+                tagline = "★ High-Density Industrial Automation Control";
+                highlightSpecs = [
+                    { value: "MQTT/OPC", label: "Standard Protocols" },
+                    { value: "ARM M4", label: "Processor Core" },
+                    { value: "IP67", label: "Enclosure Protection" },
+                    { value: "LoRaWAN", label: "Wireless Range" },
+                    { value: "-40/+85", label: "Operating Temp (°C)" },
+                    { value: "ATEX", label: "Certified Safety" }
+                ];
+                specsElectrical = {
+                    "Working Voltage": "12-24V DC input",
+                    "Current Consumption": "50mA active, 5uA sleep",
+                    "ADC Resolution": "16-bit differential inputs",
+                    "Isolation Protection": "2.5 kV optical isolation",
+                    "Watchdog Timer": "Hardware independent timer"
+                };
+                specsMechanical = {
+                    "Housing Type": "DIN-Rail mountable enclosure",
+                    "Dimensions": "115mm x 90mm x 40mm",
+                    "Terminal Block": "Detachable screwless cage-clamp",
+                    "Weight": "240 grams",
+                    "Material": "Flame-retardant ABS (UL94 V-0)"
+                };
+                specsEnvironmental = {
+                    "Temperature Limits": "-40°C to +85°C",
+                    "Vibration Resistance": "MIL-STD-810G compliant",
+                    "Shock Immunity": "30g, 11ms half-sine pulse",
+                    "Humidity Tolerance": "0% to 95% non-condensing"
+                };
+                specsCompliance = {
+                    "EMC Testing": "EN 55032 Class A, IEC 61000-4-2",
+                    "Approvals": "CE, FCC Part 15, RoHS Compliant",
+                    "Explosion Proofing": "ATEX Zone 2 / IECEx certified",
+                    "MTBF Rating": "> 250,000 hours at 40°C"
+                };
+                apps = [
+                    { title: "Machine Telemetry", desc: "Detaches legacy serial and analog output and broadcasts structured telemetry upstream over secure MQTT.", icon: "📡" },
+                    { title: "Factory Automation", desc: "Direct PLC-to-cloud mapping protocols allowing remote command overrides with sub-10ms response.", icon: "⚙️" },
+                    { title: "Edge Control Networks", desc: "Coordinates complex mesh grids across 100+ low-power nodes without single point of failure.", icon: "🕸️" }
+                ];
+            }
+
+            // Parse specifications override from db features if they exist and have colons
+            let customSpecs = {};
+            let customApps = [];
+            let dbHasSpecs = false;
+
+            featureList.forEach(f => {
+                if (f.includes(':')) {
+                    let parts = f.split(':');
+                    customSpecs[parts[0].trim()] = parts.slice(1).join(':').trim();
+                    dbHasSpecs = true;
+                } else {
+                    customApps.push(f);
+                }
+            });
+
+            if (dbHasSpecs) {
+                // Overlay custom database specs into Electrical
+                specsElectrical = Object.assign({}, specsElectrical, customSpecs);
+                if (customApps.length > 0) {
+                    apps = customApps.map((a, idx) => ({ title: `Feature ${idx + 1}`, desc: a, icon: "✓" }));
+                }
+            }
+
+            // Generate specification cards lists
+            const makeSpecRows = (obj) => Object.entries(obj).map(([key, val]) => `
+                <tr>
+                    <td class="label">${key}</td>
+                    <td class="value">${val}</td>
+                </tr>
+            `).join('');
+
+            // Related items carousel setup
+            const relatedProducts = _allProducts.filter(x => String(x.id) !== String(p.id)).slice(0, 3);
+            const relatedHtml = relatedProducts.map(rp => `
+                <div class="product-card visible" onclick="window.location.hash='product-${rp.id}'" style="cursor:pointer;">
+                    <div class="product-img" style="aspect-ratio: 16/10;">
+                        <img src="${rp.img || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800'}" alt="${rp.name}">
                     </div>
-                </div>` : ''}
-                <div style="margin-top:24px;">
-                    <a href="contact.html" class="btn-primary">Apply for This Track →</a>
+                    <div class="product-body" style="padding: 20px;">
+                        <h4 style="font-family:var(--font-eng);font-size:15px;font-weight:700;color:var(--prod-text);margin-bottom:6px;">${rp.name}</h4>
+                        <p style="font-size:12.5px;color:var(--prod-muted);line-height:1.4;margin:0;">${rp.desc || ''}</p>
+                    </div>
                 </div>
+            `).join('');
+
+            // Inject structural template
+            detailContainer.innerHTML = `
+                <!-- Sticky Product Topbar -->
+                <nav class="detail-nav">
+                    <div class="detail-nav-inner" style="justify-content: flex-end;">
+                        <button class="detail-nav-close" onclick="window.location.hash=''">&larr; Back to Catalog</button>
+                    </div>
+                </nav>
+
+                <!-- Hero Section -->
+                <section class="detail-hero fade-in-up-anim" id="detailOverview">
+                    <div class="detail-hero-content">
+                        <div class="detail-brand-tag">SMPS ELECTRIC</div>
+                        <h1 class="detail-hero-title">${mainName}</h1>
+                        <div class="detail-hero-subtitle">${modelName || categoryLabel}</div>
+                        <h2 class="detail-hero-headline">${engineeringHeadline}</h2>
+                        
+                        <div class="detail-mini-highlights">
+                            <span>22kW</span>
+                            <span>•</span>
+                            <span>IP65</span>
+                            <span>•</span>
+                            <span>CE Certified</span>
+                            <span>•</span>
+                            <span>Made in India</span>
+                            <span>•</span>
+                            <span class="stars">★★★★★ Engineering Grade</span>
+                        </div>
+                        
+                        <div class="detail-hero-actions">
+                            <a href="#detailQuote" class="btn-saas-primary">Request Quote &rarr;</a>
+                            <a href="javascript:void(0)" onclick="triggerDatasheetDownload('${p.name}')" class="btn-saas-secondary">Download Datasheet</a>
+                        </div>
+                    </div>
+                    <div class="detail-gallery">
+                        <div class="detail-image-viewer" id="viewerMain" onclick="toggleViewerZoom()">
+                            <img src="${mainImg}" alt="${p.name}" id="viewerImgMain">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Technical Specification Highlights -->
+                <div class="detail-highlights-wrap">
+                    <div class="detail-section-container">
+                        <div class="detail-highlights-grid">
+                            ${highlightSpecs.map(h => `
+                                <div class="detail-highlight-card">
+                                    <div class="detail-highlight-value">${h.value}</div>
+                                    <div class="detail-highlight-label">${h.label}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Specifications Cards -->
+                <section class="detail-specs-section" id="detailSpecs">
+                    <div class="detail-section-container">
+                        <div class="detail-section-title-wrap">
+                            <h3>Technical Specifications</h3>
+                            <p>Rigorous electrical, mechanical, environmental and compliance metrics.</p>
+                        </div>
+                        <div class="detail-specs-groups">
+                            <div class="detail-spec-group-card">
+                                <h4 class="detail-spec-group-title">Electrical Data</h4>
+                                <table class="detail-spec-table">
+                                    <tbody>
+                                        ${makeSpecRows(specsElectrical)}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="detail-spec-group-card">
+                                <h4 class="detail-spec-group-title">Mechanical &amp; Enclosure</h4>
+                                <table class="detail-spec-table">
+                                    <tbody>
+                                        ${makeSpecRows(specsMechanical)}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="detail-spec-group-card">
+                                <h4 class="detail-spec-group-title">Environmental &amp; Operation</h4>
+                                <table class="detail-spec-table">
+                                    <tbody>
+                                        ${makeSpecRows(specsEnvironmental)}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="detail-spec-group-card">
+                                <h4 class="detail-spec-group-title">Compliance &amp; Certifications</h4>
+                                <table class="detail-spec-table">
+                                    <tbody>
+                                        ${makeSpecRows(specsCompliance)}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Applications Grid -->
+                <section class="detail-apps-section" id="detailApps">
+                    <div class="detail-section-container">
+                        <div class="detail-section-title-wrap">
+                            <h3>Engineered Applications</h3>
+                            <p>High-reliability deployment sectors for key infrastructure and automation layouts.</p>
+                        </div>
+                        <div class="detail-apps-grid">
+                            ${apps.map(app => `
+                                <div class="detail-app-card">
+                                    <div class="detail-app-card-icon">${app.icon || '✓'}</div>
+                                    <h4 class="detail-app-card-title">${app.title}</h4>
+                                    <p class="detail-app-card-desc">${app.desc}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
+
+
+
+                <!-- Professional Enterprise Quote Form -->
+                <section class="detail-quote-section" id="detailQuote">
+                    <div class="detail-quote-container">
+                        <div style="text-align:center;margin-bottom:28px;">
+                            <h3 style="font-family:var(--font-eng);font-size:24px;font-weight:700;color:var(--prod-text);">Request Quote</h3>
+                            <p style="font-size:14px;color:var(--prod-muted);margin-top:6px;">Specify your engineering requirements for a customized technical quotation.</p>
+                        </div>
+                        <form class="detail-quote-form" onsubmit="handleQuoteSubmit(event)">
+                            <input type="hidden" name="product_name" value="${p.name}">
+                            <div class="detail-form-group">
+                                <label class="detail-form-label">Full Name</label>
+                                <input type="text" class="detail-form-input" required placeholder="John Doe">
+                            </div>
+                            <div class="detail-form-group">
+                                <label class="detail-form-label">Business Email</label>
+                                <input type="email" class="detail-form-input" required placeholder="name@company.com">
+                            </div>
+                            <div class="detail-form-group">
+                                <label class="detail-form-label">Company Name</label>
+                                <input type="text" class="detail-form-input" required placeholder="Acme Corporation">
+                            </div>
+                            <div class="detail-form-group">
+                                <label class="detail-form-label">Target Quantity</label>
+                                <input type="number" class="detail-form-input" required min="1" value="10">
+                            </div>
+                            <div class="detail-form-group">
+                                <label class="detail-form-label">Industry Sector</label>
+                                <input type="text" class="detail-form-input" placeholder="Automotive, Grid, Solar">
+                            </div>
+                            <div class="detail-form-group">
+                                <label class="detail-form-label">Country</label>
+                                <input type="text" class="detail-form-input" placeholder="Germany, United States">
+                            </div>
+                            <div class="detail-form-group full-width">
+                                <label class="detail-form-label">Project Integration Details</label>
+                                <textarea class="detail-form-input detail-form-textarea" required placeholder="Specify voltage spikes, physical environment, custom enclosures or compliance limits..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-saas-primary detail-form-submit">Submit RFQ &rarr;</button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Related Products -->
+                <section class="detail-related-section">
+                    <div class="detail-section-container">
+                        <div class="detail-section-title-wrap" style="text-align:left;margin-bottom:32px;">
+                            <h3>Related Infrastructure</h3>
+                            <p>Explore recommended system integrations and matching technology interfaces.</p>
+                        </div>
+                        <div class="detail-related-grid">
+                            ${relatedHtml}
+                        </div>
+                    </div>
+                </section>
             `;
-            document.getElementById('modalOverlay').classList.add('open');
-            document.body.style.overflow = 'hidden';
+
         }
 
-        function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalBtn(); }
-        function closeModalBtn() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+        function toggleViewerZoom() {
+            const viewer = document.getElementById('viewerMain');
+            if (viewer) {
+                viewer.classList.toggle('zoomed');
+            }
+        }
+
+        // ─── Datasheet PDF simulated downloader ──────────────────────────────
+        function triggerDatasheetDownload(productName) {
+            const toastEl = document.getElementById('toast');
+            if (toastEl) {
+                toastEl.textContent = `Downloading ${productName} Datasheet...`;
+                toastEl.classList.add('show');
+                setTimeout(() => {
+                    toastEl.classList.remove('show');
+                }, 3000);
+            }
+            
+            const dummyContent = `SMPS ELECTRIC - HIGH-PERFORMANCE INDUSTRIAL PRODUCT DATASHEET\nProduct: ${productName}\nConformity Status: ISO/CE Certified\nDate Generated: 2026\nDesigned for High-Voltage commercial and industrial grids.`;
+            const blob = new Blob([dummyContent], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${productName.replace(/\s+/g, '_')}_datasheet.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ─── General CAD/Manual simulated downloader ──────────────────────────
+        function triggerMockDownload(productName, docType, extension, size) {
+            const toastEl = document.getElementById('toast');
+            if (toastEl) {
+                toastEl.textContent = `Downloading ${productName} ${docType.replace('_', ' ')} (${size})...`;
+                toastEl.classList.add('show');
+                setTimeout(() => {
+                    toastEl.classList.remove('show');
+                }, 3000);
+            }
+
+            const dummyContent = `SMPS ELECTRIC - DUMMY DOWNLOAD FILE\nProduct Name: ${productName}\nDocument Type: ${docType}\nFormat: ${extension}\nEstimated File Size: ${size}`;
+            const blob = new Blob([dummyContent], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${productName.replace(/\s+/g, '_')}_${docType}.${extension}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ─── Quote submission handler ─────────────────────────────────────────
+        function handleQuoteSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const prodName = form.querySelector('input[name="product_name"]').value;
+            
+            const toastEl = document.getElementById('toast');
+            if (toastEl) {
+                toastEl.textContent = `RFQ for ${prodName} submitted successfully! Our engineering team will review your specifications.`;
+                toastEl.classList.add('show');
+                setTimeout(() => {
+                    toastEl.classList.remove('show');
+                }, 4000);
+            }
+
+            form.reset();
+        }
+
+        function closeModal(e) { /* Stub to prevent breakages */ }
+        function closeModalBtn() { /* Stub to prevent breakages */ }
+
+        // ─── Dynamic Routing Initialization ────────────────────────────────────
+        function openModal(id) {
+            // Re-route card clicks natively into URL hashes
+            window.location.hash = 'product-' + id;
+        }
 
         // ─── Mockup tab switcher ──────────────────────────────────────────────
         function switchMockupTab(tab) {
@@ -1541,13 +2673,22 @@
         }
 
         // ─── Init ─────────────────────────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', () => {
-            renderProducts();
-            loadProductsSettings();
-        });
-        if (document.readyState !== 'loading') {
-            renderProducts();
-            loadProductsSettings();
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        let isProductsInitialized = false;
+        async function initializeProductsPage() {
+            if (isProductsInitialized) return;
+            isProductsInitialized = true;
+            await renderProducts();
+            await loadProductsSettings();
+        }
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            initializeProductsPage();
+        } else {
+            document.addEventListener('DOMContentLoaded', initializeProductsPage);
         }
 
         window.addEventListener('storage', (e) => {
@@ -1561,10 +2702,12 @@
         });
     </script>
     <!-- Floating WhatsApp Widget -->
-    <a href="https://wa.me/919035874229" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp">
+    <a href="https://wa.me/919035874229" class="whatsapp-float" target="_blank" rel="noopener noreferrer"
+        title="Chat on WhatsApp">
         <div class="whatsapp-icon">
             <svg viewBox="0 0 448 512">
-                <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+                <path
+                    d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z" />
             </svg>
         </div>
     </a>
