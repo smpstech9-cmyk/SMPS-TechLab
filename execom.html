@@ -1168,6 +1168,16 @@
                 <h2 class="section-title" id="exExecTitle">The Minds Behind <span>The Mission</span></h2>
             </div>
             <div class="execom-grid" id="execomGrid"></div>
+
+            <!-- Core Team Members Sub-section under Minds Behind The Mission -->
+            <div id="teamContainer" style="margin-top: 56px; display: none;">
+                <div class="reveal" style="text-align:center;margin-bottom:28px;">
+                    <div class="section-badge" style="background:rgba(37,99,235,0.12);color:var(--accent);display:inline-block;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Engineering &amp; Innovation</div>
+                    <h3 style="font-size: 24px; font-weight: 700; color: var(--text);">Core Team Members</h3>
+                    <p style="color: var(--muted); font-size: 15px; margin-top: 6px; max-width: 620px; margin-left: auto; margin-right: auto;">Key engineers, specialists, and domain innovators executing our deep tech mandates.</p>
+                </div>
+                <div class="execom-grid" id="teamGrid"></div>
+            </div>
         </div>
     </section>
 
@@ -1467,6 +1477,7 @@
 
         let execomMembers = [];
         let advisors = [];
+        let teamMembers = [];
 
         async function loadCommittee() {
             try {
@@ -1474,10 +1485,12 @@
                 if (res.ok) {
                     const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) {
-                        execomMembers = data.filter(x => x.type === 'execom');
+                        execomMembers = data.filter(x => !x.type || x.type === 'execom');
                         advisors = data.filter(x => x.type === 'advisor');
+                        teamMembers = data.filter(x => x.type === 'team');
                         renderExecom();
                         renderAdvisors();
+                        renderTeam();
                         initReveal();
                         
                         // Sync to DataStore cache
@@ -1485,6 +1498,7 @@
                             try {
                                 await DataStore.saveList('execomMembers', execomMembers);
                                 await DataStore.saveList('advisors', advisors);
+                                await DataStore.saveList('teamMembers', teamMembers);
                             } catch (se) {}
                         }
                         return;
@@ -1499,18 +1513,14 @@
                 try {
                     const localExecs = await DataStore.getList('execomMembers', null);
                     const localAdvisors = await DataStore.getList('advisors', null);
-                    if (Array.isArray(localExecs) && localExecs.length > 0) {
-                        execomMembers = localExecs;
-                    } else {
-                        execomMembers = [];
-                    }
-                    if (Array.isArray(localAdvisors) && localAdvisors.length > 0) {
-                        advisors = localAdvisors;
-                    } else {
-                        advisors = [];
-                    }
+                    const localTeams = await DataStore.getList('teamMembers', null);
+                    execomMembers = Array.isArray(localExecs) && localExecs.length > 0 ? localExecs : [];
+                    advisors = Array.isArray(localAdvisors) && localAdvisors.length > 0 ? localAdvisors : [];
+                    teamMembers = Array.isArray(localTeams) && localTeams.length > 0 ? localTeams : [];
+
                     renderExecom();
                     renderAdvisors();
+                    renderTeam();
                     initReveal();
                     return;
                 } catch (e) {
@@ -1520,19 +1530,24 @@
 
             execomMembers = [];
             advisors = [];
+            teamMembers = [];
             renderExecom();
             renderAdvisors();
+            renderTeam();
             initReveal();
         }
 
         function renderExecom() {
             document.getElementById('execomGrid').innerHTML = execomMembers.map(m => `
       <div class="execom-card reveal" onclick="openMemberModal('${m.id}','execom')">
-        ${m.img ? `<img src="${m.img}" class="execom-avatar" onerror="handleImageError(this, '${m.img}', '${m.initials}')">` : '<div class="execom-avatar">' + m.initials + '</div>'}
+        ${m.img ? `<img src="${m.img}" class="execom-avatar" onerror="handleImageError(this, '${m.img}', '${m.initials}')">` : '<div class="execom-avatar">' + (m.initials || 'EC') + '</div>'}
         <h3>${m.name}</h3>
         <div class="execom-role">${m.role}</div>
-        <div class="execom-expertise">${m.expertise}</div>
-        <div class="execom-social"><a href="${m.linkedin}" class="social-link">in</a><a href="mailto:${m.email}" class="social-link">✉️</a></div>
+        <div class="execom-expertise">${m.expertise || ''}</div>
+        <div class="execom-social">
+          ${m.linkedin ? `<a href="${m.linkedin}" target="_blank" rel="noopener noreferrer" class="social-link">in</a>` : ''}
+          ${m.email ? `<a href="mailto:${m.email}" class="social-link">✉️</a>` : ''}
+        </div>
       </div>
     `).join('');
         }
@@ -1540,16 +1555,47 @@
         function renderAdvisors() {
             document.getElementById('advisorGrid').innerHTML = advisors.map(a => `
       <div class="execom-card reveal" onclick="openMemberModal('${a.id}','advisor')">
-        ${a.img ? `<img src="${a.img}" class="execom-avatar" onerror="handleImageError(this, '${a.img}', '${a.initials}')">` : '<div class="execom-avatar">' + a.initials + '</div>'}
+        ${a.img ? `<img src="${a.img}" class="execom-avatar" onerror="handleImageError(this, '${a.img}', '${a.initials}')">` : '<div class="execom-avatar">' + (a.initials || 'AD') + '</div>'}
         <h3>${a.name}</h3>
         <div class="execom-role">${a.role}</div>
-        <div class="execom-expertise">${a.expertise}</div>
+        <div class="execom-expertise">${a.expertise || ''}</div>
+        <div class="execom-social">
+          ${a.linkedin ? `<a href="${a.linkedin}" target="_blank" rel="noopener noreferrer" class="social-link">in</a>` : ''}
+          ${a.email ? `<a href="mailto:${a.email}" class="social-link">✉️</a>` : ''}
+        </div>
+      </div>
+    `).join('');
+        }
+
+        function renderTeam() {
+            const container = document.getElementById('teamGrid');
+            const wrap = document.getElementById('teamContainer');
+            if (!container) return;
+            if (!teamMembers || teamMembers.length === 0) {
+                if (wrap) wrap.style.display = 'none';
+                return;
+            }
+            if (wrap) wrap.style.display = 'block';
+            container.innerHTML = teamMembers.map(m => `
+      <div class="execom-card reveal" onclick="openMemberModal('${m.id}','team')">
+        ${m.img ? `<img src="${m.img}" class="execom-avatar" onerror="handleImageError(this, '${m.img}', '${m.initials}')">` : '<div class="execom-avatar">' + (m.initials || 'TM') + '</div>'}
+        <h3>${m.name}</h3>
+        <div class="execom-role">${m.role}</div>
+        <div class="execom-expertise">${m.expertise || ''}</div>
+        <div class="execom-social">
+          ${m.linkedin ? `<a href="${m.linkedin}" target="_blank" rel="noopener noreferrer" class="social-link">in</a>` : ''}
+          ${m.email ? `<a href="mailto:${m.email}" class="social-link">✉️</a>` : ''}
+        </div>
       </div>
     `).join('');
         }
 
         function openMemberModal(id, type) {
-            const member = type === 'execom' ? execomMembers.find(m => String(m.id) === String(id)) : advisors.find(a => String(a.id) === String(id));
+            const member = type === 'execom' 
+                ? execomMembers.find(m => String(m.id) === String(id)) 
+                : (type === 'advisor' 
+                    ? advisors.find(a => String(a.id) === String(id)) 
+                    : teamMembers.find(t => String(t.id) === String(id)));
             if (!member) return;
             
             // Overwrite overlay style / hide regular modalTitle

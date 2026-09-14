@@ -2560,14 +2560,14 @@
     <section id="placement-section" class="placement-section">
         <div class="container">
             <div class="section-header reveal">
-                <div class="section-badge">Placement & Talent Gap</div>
-                <h1 class="section-title">Graduates Need Placements.<br><span class="gradient-text">Startups Need
+                <div class="section-badge" id="hp-place-badge">Placement & Talent Gap</div>
+                <h1 class="section-title" id="hp-place-head">Graduates Need Placements.<br><span class="gradient-text">Startups Need
                         Experts.</span></h1>
-                <p class="section-sub">We bridge the talent gap by turning engineering students into industry‑ready
+                <p class="section-sub" id="hp-place-sub">We bridge the talent gap by turning engineering students into industry‑ready
                     DeepTech professionals, delivering plug‑in‑play talent for high‑impact startups.</p>
                 <div class="cta-group">
-                    <a href="about.html" class="btn-primary cta-primary">Explore the Mission</a>
-                    <a href="programs.html" class="btn-secondary cta-secondary">View Programs</a>
+                    <a href="about.html" class="btn-primary cta-primary" id="hp-place-btn1">Explore the Mission</a>
+                    <a href="collaborate.html" class="btn-secondary cta-secondary" id="hp-place-btn2">View Programs</a>
                 </div>
             </div>
             <div class="cards-grid reveal">
@@ -3536,7 +3536,19 @@
             setHTML('hp-heroSub', homeData.heroSub ?? defaultHome.heroSub);
             setText('hp-badge', homeData.heroBadge ?? defaultHome.heroBadge);
             setText('hp-btn1', homeData.btn1 ?? defaultHome.btn1);
+            if (homeData.btn1Link && document.getElementById('hp-btn1')) document.getElementById('hp-btn1').setAttribute('href', homeData.btn1Link);
             setText('hp-btn2', homeData.btn2 ?? defaultHome.btn2);
+            if (homeData.btn2Link && document.getElementById('hp-btn2')) document.getElementById('hp-btn2').setAttribute('href', homeData.btn2Link);
+            if (homeData.heroMedia) {
+                const videoEl = document.getElementById('hero-video');
+                if (videoEl) {
+                    const sourceEl = videoEl.querySelector('source');
+                    if (sourceEl && sourceEl.getAttribute('src') !== homeData.heroMedia) {
+                        sourceEl.setAttribute('src', homeData.heroMedia);
+                        videoEl.load();
+                    }
+                }
+            }
             setText('hp-stat1', homeData.stat1 ?? defaultHome.stat1);
             setText('hp-stat1l', homeData.stat1l ?? defaultHome.stat1l);
             setText('hp-stat2', homeData.stat2 ?? defaultHome.stat2);
@@ -3547,6 +3559,15 @@
             setText('hp-stat4l', homeData.stat4l ?? defaultHome.stat4l);
             setHTML('hp-aboutHead', homeData.aboutHead ?? defaultHome.aboutHead);
             setText('hp-aboutDesc', homeData.aboutDesc ?? defaultHome.aboutDesc);
+
+            // ── Placement & Talent Gap Section ──
+            if (homeData.placeBadge) setText('hp-place-badge', homeData.placeBadge);
+            if (homeData.placeHead) setHTML('hp-place-head', homeData.placeHead);
+            if (homeData.placeSub) setText('hp-place-sub', homeData.placeSub);
+            if (homeData.placeBtn1) setText('hp-place-btn1', homeData.placeBtn1);
+            if (homeData.placeBtn1Link && document.getElementById('hp-place-btn1')) document.getElementById('hp-place-btn1').setAttribute('href', homeData.placeBtn1Link);
+            if (homeData.placeBtn2) setText('hp-place-btn2', homeData.placeBtn2);
+            if (homeData.placeBtn2Link && document.getElementById('hp-place-btn2')) document.getElementById('hp-place-btn2').setAttribute('href', homeData.placeBtn2Link);
 
             // ── Clients Section ──
             setText('hp-clients-badge', homeData.clientsBadge ?? defaultHome.clientsBadge);

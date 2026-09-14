@@ -1022,14 +1022,26 @@ const Home = (() => {
   function applyFields(d) {
     Utils.setVal('hp-heroTitle', d.heroTitle || '');
     Utils.setVal('hp-heroSub',   d.heroSub   || '');
+    Utils.setVal('hp-heroBadge', d.heroBadge || 'India’s Deep-Tech Innovation & Engineering Ecosystem');
     Utils.setVal('hp-btn1',      d.btn1      || '');
+    Utils.setVal('hp-btn1-link', d.btn1Link || 'collaborate.html');
     Utils.setVal('hp-btn2',      d.btn2      || '');
+    Utils.setVal('hp-btn2-link', d.btn2Link || 'about.html');
+    Utils.setVal('hp-heroMedia', d.heroMedia || 'assets/videos/video.mp4');
     Utils.setVal('hp-stat1',  d.stat1  || '16+');  Utils.setVal('hp-stat1l', d.stat1l || 'Intellectual Properties');
     Utils.setVal('hp-stat2',  d.stat2  || '10+'); Utils.setVal('hp-stat2l', d.stat2l || 'Quantum Innovation Force');
     Utils.setVal('hp-stat3',  d.stat3  || '500+');  Utils.setVal('hp-stat3l', d.stat3l || 'R&D Contributor');
     Utils.setVal('hp-stat4',  d.stat4  || '100+');   Utils.setVal('hp-stat4l', d.stat4l || 'Research Ecosystem');
     Utils.setVal('hp-aboutHead', d.aboutHead || '');
     Utils.setVal('hp-aboutDesc', d.aboutDesc || '');
+    // Placement & Talent Gap section
+    Utils.setVal('hp-place-badge', d.placeBadge || 'Placement & Talent Gap');
+    Utils.setVal('hp-place-head',  d.placeHead  || 'Graduates Need Placements.<br><span class="gradient-text">Startups Need Experts.</span>');
+    Utils.setVal('hp-place-sub',   d.placeSub   || 'We bridge the talent gap by turning engineering students into industry-ready DeepTech professionals, delivering plug-in-play talent for high-impact startups.');
+    Utils.setVal('hp-place-btn1',  d.placeBtn1  || 'Explore the Mission');
+    Utils.setVal('hp-place-btn1-link', d.placeBtn1Link || 'about.html');
+    Utils.setVal('hp-place-btn2',  d.placeBtn2  || 'View Programs');
+    Utils.setVal('hp-place-btn2-link', d.placeBtn2Link || 'collaborate.html');
     // New section fields
     Utils.setVal('hp-clients-badge', d.clientsBadge || 'The SMPS Ecosystem');
     Utils.setVal('hp-clients-head',  d.clientsHead  || 'This is the <span>SMPS Ecosystem</span>');
@@ -1079,13 +1091,24 @@ const Home = (() => {
       : [];
 
     const d = {
+      heroBadge: Utils.getVal('hp-heroBadge'),
       heroTitle: Utils.getVal('hp-heroTitle'), heroSub: Utils.getVal('hp-heroSub'),
-      btn1: Utils.getVal('hp-btn1'), btn2: Utils.getVal('hp-btn2'),
+      btn1: Utils.getVal('hp-btn1'), btn1Link: Utils.getVal('hp-btn1-link'),
+      btn2: Utils.getVal('hp-btn2'), btn2Link: Utils.getVal('hp-btn2-link'),
+      heroMedia: Utils.getVal('hp-heroMedia'),
       stat1: Utils.getVal('hp-stat1'), stat1l: Utils.getVal('hp-stat1l'),
       stat2: Utils.getVal('hp-stat2'), stat2l: Utils.getVal('hp-stat2l'),
       stat3: Utils.getVal('hp-stat3'), stat3l: Utils.getVal('hp-stat3l'),
       stat4: Utils.getVal('hp-stat4'), stat4l: Utils.getVal('hp-stat4l'),
       aboutHead: Utils.getVal('hp-aboutHead'), aboutDesc: Utils.getVal('hp-aboutDesc'),
+      // Placement section
+      placeBadge: Utils.getVal('hp-place-badge'),
+      placeHead:  Utils.getVal('hp-place-head'),
+      placeSub:   Utils.getVal('hp-place-sub'),
+      placeBtn1:  Utils.getVal('hp-place-btn1'),
+      placeBtn1Link: Utils.getVal('hp-place-btn1-link'),
+      placeBtn2:  Utils.getVal('hp-place-btn2'),
+      placeBtn2Link: Utils.getVal('hp-place-btn2-link'),
       // New section fields
       clientsBadge: Utils.getVal('hp-clients-badge'),
       clientsHead:  Utils.getVal('hp-clients-head'),
@@ -1257,11 +1280,15 @@ const About = (() => {
     const container = Utils.el('teamList');
     if (!container) return;
     container.innerHTML = team.map((m, i) => `
-      <div class="dynamic-row team-row" data-idx="${i}">
-        <input type="text" class="dyn-input" data-f="initials" value="${Utils.sanitize(m.initials)}" placeholder="SK" style="text-align:center;font-weight:700">
-        <input type="text" class="dyn-input" data-f="name" value="${Utils.sanitize(m.name)}" placeholder="Full Name">
-        <input type="text" class="dyn-input" data-f="role" value="${Utils.sanitize(m.role)}" placeholder="Role/Title">
-        <input type="text" class="dyn-input" data-f="bio"  value="${Utils.sanitize(m.bio)}"  placeholder="Short bio">
+      <div class="dynamic-row team-row" data-idx="${i}" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--card-bg);padding:10px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
+        <input type="text" class="dyn-input" data-f="initials" value="${Utils.sanitize(m.initials)}" placeholder="Initials" style="text-align:center;font-weight:700;width:65px;">
+        <input type="text" class="dyn-input" data-f="name" value="${Utils.sanitize(m.name)}" placeholder="Full Name" style="width:160px;font-weight:600;">
+        <input type="text" class="dyn-input" data-f="role" value="${Utils.sanitize(m.role)}" placeholder="Role/Title" style="width:160px;">
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:200px;">
+          <input type="text" class="dyn-input" data-f="img" value="${Utils.sanitize(m.img || '')}" placeholder="Photo URL (assets/team/...)" style="flex:1;">
+          <button type="button" class="btn btn-secondary btn-sm upload-team-img-btn" style="padding:4px 8px;font-size:12px;white-space:nowrap;" title="Upload photo">📤 Upload</button>
+        </div>
+        <input type="text" class="dyn-input" data-f="bio"  value="${Utils.sanitize(m.bio)}"  placeholder="Short bio" style="flex:2;min-width:220px;">
         <button class="btn btn-danger btn-sm remove-item" data-list="team" data-idx="${i}">✕</button>
       </div>
     `).join('');
@@ -1310,6 +1337,7 @@ const About = (() => {
       initials: row.querySelector('[data-f="initials"]')?.value || '',
       name:     row.querySelector('[data-f="name"]')?.value     || '',
       role:     row.querySelector('[data-f="role"]')?.value     || '',
+      img:      row.querySelector('[data-f="img"]')?.value      || '',
       bio:      row.querySelector('[data-f="bio"]')?.value      || '',
     }));
   }
@@ -1343,7 +1371,7 @@ const About = (() => {
 
     Utils.el('addTeamBtn')?.addEventListener('click', () => {
       const t = collectTeam();
-      t.push({ initials: '', name: '', role: '', bio: '' });
+      t.push({ initials: '', name: '', role: '', img: '', bio: '' });
       renderTeamList(t);
     });
     Utils.el('addCoreBtn')?.addEventListener('click', () => {
@@ -1362,9 +1390,64 @@ const About = (() => {
       renderAchList(t);
     });
 
-    // Event delegation for remove buttons across all lists
+    // Event delegation for remove buttons and photo uploaders across all lists
     document.querySelectorAll('#page-about').forEach(page => {
-      page.addEventListener('click', (e) => {
+      page.addEventListener('click', async (e) => {
+        const uploadBtn = e.target.closest('.upload-team-img-btn');
+        if (uploadBtn) {
+          const row = uploadBtn.closest('.team-row');
+          const imgInput = row ? row.querySelector('[data-f="img"]') : null;
+          if (!imgInput) return;
+          const fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.accept = 'image/*';
+          fileInput.style.display = 'none';
+          fileInput.addEventListener('change', async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+            uploadBtn.textContent = '⏳ Uploading...';
+            try {
+              let uploadedUrl = null;
+              if (window.firebase && typeof window.firebase.storage === 'function') {
+                try {
+                  const fileExt = file.name.split('.').pop();
+                  const fileName = `team_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${fileExt}`;
+                  const storageRef = window.firebase.storage().ref();
+                  const fileRef = storageRef.child(`uploads/${fileName}`);
+                  const snapshot = await fileRef.put(file);
+                  uploadedUrl = await snapshot.ref.getDownloadURL();
+                } catch (fe) {
+                  console.warn('Firebase storage upload failed, falling back to local API', fe);
+                }
+              }
+              if (!uploadedUrl) {
+                const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+                const formData = new FormData();
+                formData.append('file', file);
+                const headers = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                const res = await fetch('/api/upload', { method: 'POST', headers, body: formData });
+                if (res.ok) {
+                  const data = await res.json();
+                  uploadedUrl = data.url;
+                } else {
+                  throw new Error('Server returned error on upload');
+                }
+              }
+              if (uploadedUrl) {
+                imgInput.value = uploadedUrl;
+                uploadBtn.textContent = '✅ Done';
+                Toast.show('Photo uploaded successfully!', 'success');
+              }
+            } catch (err) {
+              uploadBtn.textContent = '❌ Failed';
+              Toast.show('Upload failed: ' + err.message, 'error');
+            }
+          });
+          fileInput.click();
+          return;
+        }
+
         if (e.target.classList.contains('remove-item')) {
           const idx = parseInt(e.target.dataset.idx);
           const listType = e.target.dataset.list;
@@ -1793,34 +1876,84 @@ const Execom = (() => {
     return [];
   }
 
+  let currentFilter = 'all';
+
+  async function getAll() {
+    try {
+      const res = await fetch('/api/execom?_=' + Date.now());
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list)) {
+          window._cachedExecomData = list;
+          return list;
+        }
+      }
+    } catch (e) {
+      console.warn('Backend execom fetch failed, trying DataStore...', e);
+    }
+
+    if (window._cachedExecomData !== undefined) return window._cachedExecomData;
+
+    try {
+      const execs = await DataStore.getList('execomMembers', null);
+      const advs = await DataStore.getList('advisors', null);
+      const teams = await DataStore.getList('teamMembers', null);
+      if ((Array.isArray(execs) && execs.length > 0) || (Array.isArray(advs) && advs.length > 0) || (Array.isArray(teams) && teams.length > 0)) {
+        const combined = [...(execs || []), ...(advs || []), ...(teams || [])];
+        window._cachedExecomData = combined;
+        return combined;
+      }
+    } catch (e) {
+      console.warn('DataStore getList failed for execom', e);
+    }
+
+    return [];
+  }
+
   async function saveAll(list) {
     window._cachedExecomData = list;
     try {
-      const execs = list.filter(x => x.type === 'execom');
+      const execs = list.filter(x => !x.type || x.type === 'execom');
       const advs = list.filter(x => x.type === 'advisor');
+      const teams = list.filter(x => x.type === 'team');
       await DataStore.saveList('execomMembers', execs);
       await DataStore.saveList('advisors', advs);
+      await DataStore.saveList('teamMembers', teams);
     } catch (e) {
       console.warn('Failed to sync execom to DataStore:', e);
     }
   }
 
   async function render() {
-    const members = await getAll();
+    let members = await getAll();
     const tbody = Utils.el('execomTableBody');
     if (!tbody) return;
 
     if (!Array.isArray(members) || members.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:40px"><div class="es-icon">👥</div><h3>No members yet</h3><p>Add your first committee member.</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:40px"><div class="es-icon">👥</div><h3>No members yet</h3><p>Add your first committee member or advisor.</p></div></td></tr>`;
       return;
     }
 
-    tbody.innerHTML = members.map(m => `
+    if (currentFilter !== 'all') {
+      members = members.filter(m => (m.type || 'execom') === currentFilter);
+    }
+
+    if (members.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:30px"><div class="es-icon">🔍</div><h3>No members match filter</h3><p>No members found for category "${currentFilter}".</p></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = members.map(m => {
+      const typeLabel = m.type === 'advisor' ? 'Advisor' : (m.type === 'team' ? 'Team Member' : 'Execom');
+      const typePillClass = m.type === 'advisor' ? 'pill-gold' : (m.type === 'team' ? 'pill-blue' : 'pill-purple');
+      const imgSrc = m.img ? ((m.img.startsWith('http://') || m.img.startsWith('https://') || m.img.startsWith('data:')) ? m.img : '../' + m.img) : '';
+
+      return `
       <tr>
         <td>
           <div style="display:flex;align-items:center;gap:10px">
-            ${m.img ? `<img src="${(m.img.startsWith('http://') || m.img.startsWith('https://') || m.img.startsWith('data:')) ? m.img : '../' + m.img}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
-            <div class="initials-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent-dim);display:${m.img ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:var(--accent);">${Utils.sanitize(m.initials || '??')}</div>
+            ${m.img ? `<img src="${imgSrc}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1px solid var(--border);" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
+            <div class="initials-avatar" style="width:34px;height:34px;border-radius:50%;background:var(--accent-dim);display:${m.img ? 'none' : 'flex'};align-items:center;justify-content:center;font-size:12px;font-weight:bold;color:var(--accent);">${Utils.sanitize(m.initials || '??')}</div>
             <div>
               <div class="td-title">${Utils.sanitize(m.name)}</div>
               <div class="td-muted">${Utils.sanitize(m.email || 'No email')}</div>
@@ -1828,19 +1961,33 @@ const Execom = (() => {
           </div>
         </td>
         <td class="td-muted">${Utils.sanitize(m.role)}</td>
-        <td><span class="pill ${m.type === 'execom' ? 'pill-purple' : 'pill-gold'}">${m.type === 'execom' ? 'Execom' : 'Advisor'}</span></td>
+        <td><span class="pill ${typePillClass}">${typeLabel}</span></td>
         <td class="td-actions">
           <button class="btn btn-secondary btn-sm" data-edit="${m.id}">✏️ Edit</button>
           <button class="btn btn-danger btn-sm"    data-delete="${m.id}">🗑</button>
         </td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   }
 
-  async function openModal(editId) {
+  function updateImgPreview(val) {
+    const box = Utils.el('em-img-preview-box');
+    const img = Utils.el('em-img-preview');
+    if (!box || !img) return;
+    if (val && typeof val === 'string' && val.trim()) {
+      const src = (val.startsWith('http://') || val.startsWith('https://') || val.startsWith('data:')) ? val.trim() : '../' + val.trim();
+      img.src = src;
+      box.style.display = 'block';
+    } else {
+      box.style.display = 'none';
+      img.src = '';
+    }
+  }
+
+  async function openModal(editId, defaultType = 'execom') {
     Utils.setVal('em-editId', '');
-    // Hard-reset all fields — use both .value = '' and setAttribute to clear
-    // browser autofill, Grammarly suggestions, and any cached DOM state
+    // Hard-reset all fields
     ['em-name', 'em-role', 'em-initials', 'em-img', 'em-expertise', 'em-bio', 'em-quote', 'em-achievements', 'em-linkedin', 'em-email'].forEach(id => {
       const el = Utils.el(id);
       if (!el) return;
@@ -1848,20 +1995,21 @@ const Execom = (() => {
       el.setAttribute('value', '');
       el.style.borderColor = '';
       el.style.boxShadow = '';
-      // Trigger input event so any reactive listeners/extensions clear their state
       el.dispatchEvent(new Event('input', { bubbles: true }));
     });
-    // Remove any inline error banner
     const errBanner = Utils.el('execomFormError');
     if (errBanner) errBanner.remove();
 
-    Utils.el('em-type').value = 'execom';
-    Utils.el('execomModalTitle').textContent = 'Add Excom Member';
+    Utils.el('em-type').value = defaultType || 'execom';
+    Utils.el('execomModalTitle').textContent = defaultType === 'advisor' ? 'Add Strategic Advisor' : (defaultType === 'team' ? 'Add Team Member' : 'Add Excom Member');
+    updateImgPreview('');
 
     if (editId !== undefined) {
       const m = (await getAll()).find(x => String(x.id) === String(editId));
       if (m) {
-        Utils.el('execomModalTitle').textContent = 'Edit Excom Member';
+        const isAdv = m.type === 'advisor';
+        const isTeam = m.type === 'team';
+        Utils.el('execomModalTitle').textContent = isAdv ? 'Edit Strategic Advisor' : (isTeam ? 'Edit Team Member' : 'Edit Excom Member');
         Utils.setVal('em-name', m.name);
         Utils.setVal('em-role', m.role);
         Utils.setVal('em-initials', m.initials);
@@ -1874,6 +2022,7 @@ const Execom = (() => {
         Utils.setVal('em-linkedin', m.linkedin || '');
         Utils.setVal('em-email', m.email || '');
         Utils.setVal('em-editId', m.id);
+        updateImgPreview(m.img || '');
       }
     }
     Modal.open('execomModal');
@@ -1894,14 +2043,12 @@ const Execom = (() => {
     if (existingBanner) existingBanner.remove();
 
     if (!name || !role || !initials || !bio) {
-      // Highlight missing required fields in red
       const missing = [];
       if (!name)     { const el = Utils.el('em-name');     if (el) { el.style.borderColor = '#ef4444'; el.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.25)'; } missing.push('Full Name'); }
       if (!role)     { const el = Utils.el('em-role');     if (el) { el.style.borderColor = '#ef4444'; el.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.25)'; } missing.push('Role'); }
       if (!initials) { const el = Utils.el('em-initials'); if (el) { el.style.borderColor = '#ef4444'; el.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.25)'; } missing.push('Initials'); }
       if (!bio)      { const el = Utils.el('em-bio');      if (el) { el.style.borderColor = '#ef4444'; el.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.25)'; } missing.push('Biography'); }
 
-      // Show an error banner at the top of the modal body
       const modalBody = Utils.el('execomModal')?.querySelector('.modal-body');
       if (modalBody) {
         const banner = document.createElement('div');
@@ -1909,7 +2056,6 @@ const Execom = (() => {
         banner.style.cssText = 'background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#fca5a5;display:flex;align-items:center;gap:8px;';
         banner.innerHTML = `<span style="font-size:16px">⚠️</span> <strong>Required fields missing:</strong>&nbsp;${missing.join(', ')}`;
         modalBody.insertBefore(banner, modalBody.firstChild);
-        // Scroll to top of modal body to show the error
         modalBody.scrollTop = 0;
       }
       return;
@@ -1981,7 +2127,7 @@ const Execom = (() => {
 
     Modal.close('execomModal');
     render();
-    Toast.show('✅ Member saved!', 'success');
+    Toast.show('✅ Member saved successfully!', 'success');
   }
 
   async function remove(id) {
@@ -2004,8 +2150,34 @@ const Execom = (() => {
   }
 
   function init() {
-    Utils.el('addExecomBtn')?.addEventListener('click', () => openModal());
+    Utils.el('addExecomBtn')?.addEventListener('click', () => openModal(undefined, 'execom'));
+    Utils.el('addAdvisorBtn')?.addEventListener('click', () => openModal(undefined, 'advisor'));
     Utils.el('saveExecomBtn')?.addEventListener('click', save);
+
+    // Filter pills
+    const pills = document.querySelectorAll('#execomFilterPills .pill-btn');
+    pills.forEach(btn => {
+      btn.addEventListener('click', () => {
+        pills.forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'var(--card-bg)';
+          b.style.color = 'var(--text)';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'var(--accent)';
+        btn.style.color = '#fff';
+        currentFilter = btn.dataset.filter || 'all';
+        render();
+      });
+    });
+
+    // Reactive photo preview in modal
+    const imgInput = Utils.el('em-img');
+    if (imgInput) {
+      const onImgChange = () => updateImgPreview(imgInput.value);
+      imgInput.addEventListener('input', onImgChange);
+      imgInput.addEventListener('change', onImgChange);
+    }
 
     Utils.el('execomTableBody')?.addEventListener('click', (e) => {
       const editBtn   = e.target.closest('[data-edit]');
@@ -3572,12 +3744,111 @@ const Collab = (() => {
     'col-formEmail', 'col-formPhone'
   ];
 
+  const DEFAULT_STORIES = [
+    {
+      title: 'Bharat Industries — Talent Pipeline',
+      tag: 'Industry Partnership',
+      img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800',
+      desc: 'Recruited 15 freshers from our "Power Electronics Track". Result: Zero training time needed; students were productive from Day 1.',
+      result: '100% Placement Success'
+    },
+    {
+      title: 'VTU Bridge Initiative',
+      tag: 'Academic Partnership',
+      img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800',
+      desc: 'Implemented our "Industry Bridge" module for 100 final-year students. Achieved a 40% increase in campus placement rates.',
+      result: '40% Higher Placement'
+    },
+    {
+      title: 'TechVista Solutions — Talent Scaling',
+      tag: 'Startup Support',
+      img: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800',
+      desc: 'Built a custom "AI Implementation" track to train 20 interns specifically for TechVista\'s unique product stack.',
+      result: 'Trained & Hired in 3 Months'
+    }
+  ];
+
+  function renderStoriesList(stories) {
+    const container = Utils.el('collabStoriesList');
+    if (!container) return;
+    const list = (Array.isArray(stories) && stories.length > 0) ? stories : DEFAULT_STORIES;
+    container.innerHTML = list.map((s, idx) => `
+      <div class="card story-item" data-idx="${idx}" style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <strong style="font-size:14px;">Story #${idx + 1}</strong>
+          <button type="button" class="btn btn-danger btn-sm remove-story-btn" data-idx="${idx}">🗑 Remove</button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label>Partner Name / Headline</label><input type="text" class="st-title" value="${Utils.sanitize(s.title || '')}" placeholder="Bharat Industries — Talent Pipeline"></div>
+          <div class="form-group"><label>Partnership Tag</label><input type="text" class="st-tag" value="${Utils.sanitize(s.tag || '')}" placeholder="Industry Partnership"></div>
+          <div class="form-group span2">
+            <label>Image URL (or Upload)</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="text" class="st-img" value="${Utils.sanitize(s.img || '')}" placeholder="https://..." style="flex:1;">
+              <button type="button" class="btn btn-secondary btn-sm btn-upload-story-img">📤 Upload</button>
+              <input type="file" accept="image/*" class="story-file-input" style="display:none;">
+            </div>
+          </div>
+          <div class="form-group span2"><label>Case Study Description</label><textarea class="st-desc" placeholder="Details of the partnership outcome...">${Utils.sanitize(s.desc || '')}</textarea></div>
+          <div class="form-group span2"><label>Result Metric Badge</label><input type="text" class="st-result" value="${Utils.sanitize(s.result || '')}" placeholder="100% Placement Success"></div>
+        </div>
+      </div>
+    `).join('');
+
+    // Attach upload handlers to each story's upload button
+    container.querySelectorAll('.story-item').forEach(item => {
+      const uploadBtn = item.querySelector('.btn-upload-story-img');
+      const fileInput = item.querySelector('.story-file-input');
+      const imgInput = item.querySelector('.st-img');
+      if (uploadBtn && fileInput && imgInput) {
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', async () => {
+          const file = fileInput.files[0];
+          if (!file) return;
+          uploadBtn.textContent = '⏳ Uploading...';
+          try {
+            const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+            const formData = new FormData();
+            formData.append('file', file);
+            const headers = {};
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const res = await fetch('/api/upload', { method: 'POST', headers, body: formData });
+            if (res.ok) {
+              const d = await res.json();
+              if (d.url) {
+                imgInput.value = d.url;
+                uploadBtn.textContent = '✅ Uploaded';
+                Toast.show('Image uploaded successfully!', 'success');
+              }
+            } else {
+              throw new Error('Upload failed');
+            }
+          } catch (err) {
+            uploadBtn.textContent = '❌ Failed';
+            Toast.show('Upload error: ' + err.message, 'error');
+          }
+        });
+      }
+    });
+  }
+
+  function collectStories() {
+    return [...document.querySelectorAll('#collabStoriesList .story-item')].map(el => ({
+      title: el.querySelector('.st-title')?.value || '',
+      tag: el.querySelector('.st-tag')?.value || '',
+      img: el.querySelector('.st-img')?.value || '',
+      desc: el.querySelector('.st-desc')?.value || '',
+      result: el.querySelector('.st-result')?.value || ''
+    }));
+  }
+
   function applyFields(d) {
     const defaults = Defaults.collabSettings();
     FIELDS.forEach(f => {
       const key = f.replace('col-', '');
       Utils.setVal(f, d[key] !== undefined ? d[key] : (defaults[key] || ''));
     });
+    renderStoriesList(d.stories || DEFAULT_STORIES);
   }
 
   async function loadFields() {
@@ -3603,6 +3874,8 @@ const Collab = (() => {
       const key = f.replace('col-', '');
       d[key] = Utils.getVal(f);
     });
+    d.stories = collectStories();
+
     const token = localStorage.getItem('smps_token');
     if (token) {
       try {
@@ -3624,6 +3897,28 @@ const Collab = (() => {
 
   function init() {
     Utils.el('saveCollabBtn')?.addEventListener('click', save);
+    Utils.el('addCollabStoryBtn')?.addEventListener('click', () => {
+      const current = collectStories();
+      current.push({
+        title: 'New Partnership',
+        tag: 'Industry Collaboration',
+        img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800',
+        desc: 'Description of collaboration impact...',
+        result: 'Measurable Impact'
+      });
+      renderStoriesList(current);
+    });
+
+    Utils.el('collabStoriesList')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.remove-story-btn');
+      if (btn) {
+        const idx = parseInt(btn.dataset.idx, 10);
+        const current = collectStories();
+        current.splice(idx, 1);
+        renderStoriesList(current);
+      }
+    });
+
     loadFields();
   }
 

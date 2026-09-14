@@ -188,44 +188,73 @@
             <p>Edit hero text, stats, and featured content on the homepage.</p>
           </div>
           <div class="form-card">
-            <div class="form-card-title">🦸 Hero Section</div>
+            <div class="form-card-title">🦸 Hero Section &amp; Media</div>
             <div class="form-grid">
               <div class="form-group span2">
+                <label>Hero Badge Tag</label>
+                <input type="text" id="hp-heroBadge" placeholder="India’s Deep-Tech Innovation & Engineering Ecosystem">
+              </div>
+              <div class="form-group span2">
                 <label>Hero Headline (HTML allowed)</label>
-                <textarea id="hp-heroTitle" placeholder="Where Technology Meets Leadership"></textarea>
+                <textarea id="hp-heroTitle" placeholder="Enabling Future Industrial Transformation<br>Through <span>Deep-Tech Innovation</span>."></textarea>
               </div>
               <div class="form-group span2">
                 <label>Hero Subtitle</label>
-                <textarea id="hp-heroSub" placeholder="SMPS Tech Lab is a National Innovation Ecosystem Platform..."></textarea>
+                <textarea id="hp-heroSub" placeholder="SMPS Tech Lab is a research-driven technology and innovation division..."></textarea>
               </div>
               <div class="form-group">
                 <label>Primary Button Text</label>
-                <input type="text" id="hp-btn1" placeholder="Explore Products →">
+                <input type="text" id="hp-btn1" placeholder="Get Real Experience →">
+              </div>
+              <div class="form-group">
+                <label>Primary Button Link</label>
+                <input type="text" id="hp-btn1-link" placeholder="collaborate.html">
               </div>
               <div class="form-group">
                 <label>Secondary Button Text</label>
-                <input type="text" id="hp-btn2" placeholder="Collaborate With Us">
+                <input type="text" id="hp-btn2" placeholder="Learn Our Mission">
+              </div>
+              <div class="form-group">
+                <label>Secondary Button Link</label>
+                <input type="text" id="hp-btn2-link" placeholder="about.html">
+              </div>
+              <div class="form-group span2">
+                <label>Hero Video / Banner Media (URL or Upload)</label>
+                <input type="text" id="hp-heroMedia" placeholder="assets/videos/video.mp4">
               </div>
             </div>
           </div>
           <div class="form-card">
             <div class="form-card-title">📊 Stats Bar</div>
             <div class="form-grid stats-grid">
-              <div class="form-group"><label>Stat 1 — Number</label><input type="text" id="hp-stat1" placeholder="50"></div>
-              <div class="form-group"><label>Stat 1 — Label</label><input type="text" id="hp-stat1l" placeholder="IP Patents &amp; Research Papers"></div>
-              <div class="form-group"><label>Stat 2 — Number</label><input type="text" id="hp-stat2" placeholder="200"></div>
-              <div class="form-group"><label>Stat 2 — Label</label><input type="text" id="hp-stat2l" placeholder="Innovators &amp; Researchers"></div>
-              <div class="form-group"><label>Stat 3 — Number</label><input type="text" id="hp-stat3" placeholder="15"></div>
-              <div class="form-group"><label>Stat 3 — Label</label><input type="text" id="hp-stat3l" placeholder="Strategic Partners"></div>
-              <div class="form-group"><label>Stat 4 — Number</label><input type="text" id="hp-stat4" placeholder="8"></div>
-              <div class="form-group"><label>Stat 4 — Label</label><input type="text" id="hp-stat4l" placeholder="Core Product Lines"></div>
+              <div class="form-group"><label>Stat 1 — Number</label><input type="text" id="hp-stat1" placeholder="16+"></div>
+              <div class="form-group"><label>Stat 1 — Label</label><input type="text" id="hp-stat1l" placeholder="Intellectual Properties"></div>
+              <div class="form-group"><label>Stat 2 — Number</label><input type="text" id="hp-stat2" placeholder="10+"></div>
+              <div class="form-group"><label>Stat 2 — Label</label><input type="text" id="hp-stat2l" placeholder="Quantum Innovation Force"></div>
+              <div class="form-group"><label>Stat 3 — Number</label><input type="text" id="hp-stat3" placeholder="500+"></div>
+              <div class="form-group"><label>Stat 3 — Label</label><input type="text" id="hp-stat3l" placeholder="R&D Contributor"></div>
+              <div class="form-group"><label>Stat 4 — Number</label><input type="text" id="hp-stat4" placeholder="100+"></div>
+              <div class="form-group"><label>Stat 4 — Label</label><input type="text" id="hp-stat4l" placeholder="Research Ecosystem"></div>
             </div>
           </div>
           <div class="form-card">
             <div class="form-card-title">🏢 About Preview Section</div>
             <div class="form-grid">
-              <div class="form-group span2"><label>About Heading</label><input type="text" id="hp-aboutHead" placeholder="Technology Alone Does Not Define Progress"></div>
+              <div class="form-group span2"><label>About Heading</label><input type="text" id="hp-aboutHead" placeholder="Graduates Need Placements. <span>Startups Need Experts.</span>"></div>
               <div class="form-group span2"><label>About Description</label><textarea id="hp-aboutDesc"></textarea></div>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-card-title">🎓 Placement &amp; Talent Gap Section</div>
+            <div class="form-grid">
+              <div class="form-group"><label>Badge Text</label><input type="text" id="hp-place-badge" placeholder="Placement & Talent Gap"></div>
+              <div class="form-group"><label>Section Heading (HTML allowed)</label><input type="text" id="hp-place-head" placeholder="Graduates Need Placements.<br><span class=&quot;gradient-text&quot;>Startups Need Experts.</span>"></div>
+              <div class="form-group span2"><label>Section Subtitle</label><textarea id="hp-place-sub" placeholder="We bridge the talent gap by turning engineering students into industry-ready DeepTech professionals..."></textarea></div>
+              <div class="form-group"><label>Primary Button Text</label><input type="text" id="hp-place-btn1" placeholder="Explore the Mission"></div>
+              <div class="form-group"><label>Primary Button Link</label><input type="text" id="hp-place-btn1-link" placeholder="about.html"></div>
+              <div class="form-group"><label>Secondary Button Text</label><input type="text" id="hp-place-btn2" placeholder="View Programs"></div>
+              <div class="form-group"><label>Secondary Button Link</label><input type="text" id="hp-place-btn2-link" placeholder="collaborate.html"></div>
             </div>
           </div>
 
@@ -445,12 +474,21 @@
           </div>
 
           <div class="table-wrap">
-            <div class="table-toolbar">
+            <div class="table-toolbar" style="flex-wrap:wrap;gap:12px;">
               <div class="table-search">
                 <span>🔍</span>
-                <input type="text" placeholder="Search members..." id="execomSearch">
+                <input type="text" placeholder="Search members & advisors..." id="execomSearch">
               </div>
-              <button class="btn btn-primary btn-sm" id="addExecomBtn">+ Add Member</button>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <div class="filter-pills" id="execomFilterPills" style="display:flex;gap:6px;">
+                  <button class="pill-btn active" data-filter="all" style="padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--accent);color:#fff;cursor:pointer;font-size:12px;">All</button>
+                  <button class="pill-btn" data-filter="execom" style="padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--card-bg);color:var(--text);cursor:pointer;font-size:12px;">Executive Committee</button>
+                  <button class="pill-btn" data-filter="advisor" style="padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--card-bg);color:var(--text);cursor:pointer;font-size:12px;">Strategic Advisors</button>
+                  <button class="pill-btn" data-filter="team" style="padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--card-bg);color:var(--text);cursor:pointer;font-size:12px;">Team Members</button>
+                </div>
+                <button class="btn btn-primary btn-sm" id="addExecomBtn">+ Add Execom Member</button>
+                <button class="btn btn-secondary btn-sm" id="addAdvisorBtn" style="border-color:var(--accent2);color:var(--accent2);">+ Add Strategic Advisor</button>
+              </div>
             </div>
             <div class="table-responsive">
               <table id="execomTable">
@@ -810,6 +848,13 @@
               <div class="form-group"><label>Contact Email Address</label><input type="email" id="col-formEmail" placeholder="smpstechlab@gmail.com"></div>
               <div class="form-group"><label>Contact Phone Numbers</label><input type="text" id="col-formPhone" placeholder="9035874229 / 8792779543"></div>
             </div>
+          </div>
+
+          <div class="form-card" style="margin-top: 20px;">
+            <div class="form-card-title">🌟 Success Stories Management (Cards)</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Add, edit, or update success stories displayed on the Collaborate page. Each story includes image, partnership tag, title, description, and key result.</p>
+            <div id="collabStoriesList" style="display:flex;flex-direction:column;gap:14px;"></div>
+            <button class="btn btn-secondary btn-sm" id="addCollabStoryBtn" style="margin-top:14px;">+ Add Success Story</button>
           </div>
 
           <div class="btn-row" style="margin-top: 20px;">
@@ -1265,10 +1310,17 @@ Open for Strategic Partnerships</textarea>
             <label>Member Type</label>
             <select id="em-type">
               <option value="execom">Executive Committee (Execom)</option>
-              <option value="advisor">Advisor</option>
+              <option value="advisor">Strategic Advisor</option>
+              <option value="team">Team Member (Minds Behind the Mission)</option>
             </select>
           </div>
-          <div class="form-group"><label>Image URL</label><input type="text" id="em-img" placeholder="assets/team/member1.png"></div>
+          <div class="form-group">
+            <label>Member Photograph (URL or Upload)</label>
+            <input type="text" id="em-img" placeholder="assets/team/member1.png">
+            <div id="em-img-preview-box" style="display:none;margin-top:8px;">
+              <img id="em-img-preview" src="" style="max-height:80px;border-radius:8px;border:1px solid var(--border);object-fit:cover;">
+            </div>
+          </div>
           <div class="form-group span2"><label>Expertise (comma-separated)</label><input type="text" id="em-expertise" placeholder="Deep Tech, Power Electronics, System Architecture"></div>
           <div class="form-group span2"><label>Professional Biography *</label><textarea id="em-bio" placeholder="Brief background, publications, or career info..."></textarea></div>
           <div class="form-group span2"><label>Quote (optional)</label><input type="text" id="em-quote" placeholder="True engineering is not just about solving complex equations..."></div>

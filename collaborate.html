@@ -375,6 +375,7 @@
             transform: none !important;
             background: linear-gradient(90deg, #0f4ff7, #22c7ff) !important;
             -webkit-background-clip: text !important;
+            background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
         }
 
@@ -1531,7 +1532,7 @@
                 <div class="section-badge" id="storyBadge">Success Stories</div>
                 <h2 class="section-title" id="storyTitle">Partnerships That <span>Delivered Results</span></h2>
             </div>
-            <div class="stories-grid">
+            <div class="stories-grid" id="storiesGrid">
                 <div class="story-card reveal">
                     <div class="story-img">
                         <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800"
@@ -2018,6 +2019,58 @@
 
             setHTML('storyBadge', data.storyBadge || defaultCollabSettings.storyBadge);
             setHTML('storyTitle', data.storyTitle || defaultCollabSettings.storyTitle);
+
+            const defaultStories = [
+                {
+                    title: 'Bharat Industries — Talent Pipeline',
+                    tag: 'Industry Partnership',
+                    img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800',
+                    desc: 'Recruited 15 freshers from our "Power Electronics Track". Result: Zero training time needed; students were productive from Day 1.',
+                    result: '100% Placement Success'
+                },
+                {
+                    title: 'VTU Bridge Initiative',
+                    tag: 'Academic Partnership',
+                    img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800',
+                    desc: 'Implemented our "Industry Bridge" module for 100 final-year students. Achieved a 40% increase in campus placement rates.',
+                    result: '40% Higher Placement'
+                },
+                {
+                    title: 'TechVista Solutions — Talent Scaling',
+                    tag: 'Startup Support',
+                    img: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800',
+                    desc: 'Built a custom "AI Implementation" track to train 20 interns specifically for TechVista\'s unique product stack.',
+                    result: 'Trained & Hired in 3 Months'
+                }
+            ];
+
+            function renderStories(storiesList) {
+                const container = document.getElementById('storiesGrid');
+                if (!container) return;
+                const items = (Array.isArray(storiesList) && storiesList.length > 0) ? storiesList : defaultStories;
+                container.innerHTML = items.map(s => `
+                    <div class="story-card reveal">
+                        <div class="story-img">
+                            <img src="${s.img || 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'}"
+                                alt="${s.title || 'Success Story'}" onerror="this.src='https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800'">
+                        </div>
+                        <div class="story-content">
+                            <div class="story-tag">${s.tag || 'Partnership'}</div>
+                            <h3>${s.title || ''}</h3>
+                            <p>${s.desc || ''}</p>
+                            ${s.result ? `<div class="story-result"><i data-lucide="trending-up"></i> ${s.result}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                if (window.lucide && typeof lucide.createIcons === 'function') {
+                    lucide.createIcons();
+                }
+                if (window.obs) {
+                    container.querySelectorAll('.reveal').forEach(el => window.obs.observe(el));
+                }
+            }
+
+            renderStories(data.stories);
 
             setHTML('formBadge', data.formBadge || defaultCollabSettings.formBadge);
             setHTML('formTitle', data.formTitle || defaultCollabSettings.formTitle);

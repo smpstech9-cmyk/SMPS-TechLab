@@ -792,7 +792,7 @@ def delete_event(current_user, id):
 @app.route('/api/gallery', methods=['GET'])
 def get_gallery():
     conn = get_db_connection()
-    gallery = conn.execute('SELECT * FROM gallery ORDER BY id ASC').fetchall()
+    gallery = conn.execute('SELECT * FROM gallery ORDER BY id DESC').fetchall()
     conn.close()
     return jsonify([dict(g) for g in gallery])
 

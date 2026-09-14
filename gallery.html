@@ -1233,11 +1233,15 @@
                 if (res.ok) {
                     const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) {
-                        galleryData = data;
+                        galleryData = [...data].sort((a, b) => {
+                            const idA = parseInt(a.id, 10);
+                            const idB = parseInt(b.id, 10);
+                            return (!isNaN(idA) && !isNaN(idB)) ? (idB - idA) : 0;
+                        });
                         // Cache result in localStorage for offline fallback
                         try {
-                            localStorage.setItem('smps_sandbox_galleryData', JSON.stringify(data));
-                            localStorage.setItem('galleryData', JSON.stringify(data));
+                            localStorage.setItem('smps_sandbox_galleryData', JSON.stringify(galleryData));
+                            localStorage.setItem('galleryData', JSON.stringify(galleryData));
                         } catch (e) {}
                         filteredItems = [...galleryData];
                         renderGallery();
@@ -1256,7 +1260,11 @@
                 try {
                     const cached = await DataStore.getList('galleryData', null);
                     if (Array.isArray(cached) && cached.length > 0) {
-                        galleryData = cached;
+                        galleryData = [...cached].sort((a, b) => {
+                            const idA = parseInt(a.id, 10);
+                            const idB = parseInt(b.id, 10);
+                            return (!isNaN(idA) && !isNaN(idB)) ? (idB - idA) : 0;
+                        });
                         filteredItems = [...galleryData];
                         renderGallery();
                         return;
