@@ -68,13 +68,15 @@
         <button class="nav-item" data-page="home"><span class="nav-icon">🏠</span>Home Page</button>
         <button class="nav-item" data-page="about"><span class="nav-icon">ℹ️</span>About Page</button>
         <button class="nav-item" data-page="products"><span class="nav-icon">⚡</span>Products</button>
-        <button class="nav-item" data-page="execom"><span class="nav-icon">👥</span>Execom</button>
+        <button class="nav-item" data-page="execom"><span class="nav-icon">👥</span>Minds Behind Mission</button>
+        <button class="nav-item" data-page="advisors"><span class="nav-icon">🎓</span>Advisory Members</button>
         <button class="nav-item" data-page="events"><span class="nav-icon">📅</span>Events</button>
         <button class="nav-item" data-page="gallery"><span class="nav-icon">🖼️</span>Gallery</button>
         <button class="nav-item" data-page="ip"><span class="nav-icon">🔬</span>IP Portfolio</button>
-        <button class="nav-item" data-page="collaborate"><span class="nav-icon">🤝</span>Collaborate</button>
+        <button class="nav-item" data-page="collaborate"><span class="nav-icon">🤝</span>Collaborate &amp; Stories</button>
+        <button class="nav-item" data-page="media"><span class="nav-icon">📁</span>Media Library</button>
         <button class="nav-item" data-page="proposals"><span class="nav-icon">📥</span>Proposals</button>
-        <button class="nav-item" data-page="careers"><span class="nav-icon">🎓</span>Careers</button>
+        <button class="nav-item" data-page="careers"><span class="nav-icon">💼</span>Careers</button>
         <button class="nav-item" data-page="ecosystem"><span class="nav-icon">🌐</span>Ecosystem</button>
         <button class="nav-item" data-page="insights"><span class="nav-icon">💡</span>Insights / Blog</button>
 
@@ -1080,6 +1082,44 @@ Open for Strategic Partnerships</textarea>
           </div>
         </div>
 
+        <!-- ═══ MEDIA LIBRARY ═══ -->
+        <div class="tab-page" id="page-media">
+          <div class="section-header">
+            <h2>📁 Media Library</h2>
+            <p>Browse, upload, copy image URLs, and manage media assets stored locally on the server.</p>
+          </div>
+
+          <div class="media-container" style="display:flex;flex-direction:column;gap:20px;">
+            <!-- Upload Dropzone Card -->
+            <div class="form-card" style="margin-bottom:0;">
+              <div class="media-dropzone" id="mediaDropzone" style="border:2px dashed var(--border);border-radius:16px;padding:32px 20px;text-align:center;cursor:pointer;transition:var(--transition);background:var(--bg3);">
+                <div style="font-size:36px;margin-bottom:8px;">📤</div>
+                <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px;">Drag &amp; Drop media files here, or <span style="color:var(--accent);">browse</span></div>
+                <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Supports PNG, JPG, JPEG, WEBP, GIF, SVG, MP4 (Max 25MB)</div>
+                <input type="file" id="mediaFileInput" multiple accept="image/*,video/mp4" style="display:none;">
+                <button type="button" class="btn btn-primary btn-sm" id="mediaUploadTriggerBtn" style="pointer-events:none;">+ Select Files to Upload</button>
+              </div>
+            </div>
+
+            <!-- Media Toolbar & Controls -->
+            <div class="table-toolbar" style="flex-wrap:wrap;gap:12px;">
+              <div class="table-search" style="flex:1;min-width:240px;">
+                <span>🔍</span>
+                <input type="text" id="mediaSearchInput" placeholder="Search files by name...">
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-secondary btn-sm" id="mediaRefreshBtn">🔄 Refresh</button>
+                <div class="pill pill-blue" id="mediaCountBadge">0 assets</div>
+              </div>
+            </div>
+
+            <!-- Media Grid -->
+            <div class="media-grid" id="mediaGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:16px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
       </div><!-- /page-content -->
     </div><!-- /main -->
   </div><!-- /adminApp -->
@@ -1407,6 +1447,67 @@ Open for Strategic Partnerships</textarea>
       <div class="modal-foot">
         <button class="btn btn-secondary" data-close="galleryModal">Cancel</button>
         <button class="btn btn-primary" id="saveGalleryBtn">💾 Save Gallery Item</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL — SUCCESS STORY ═══ -->
+  <div class="modal-overlay" id="storyModal" role="dialog" aria-modal="true" aria-labelledby="storyModalTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="storyModalTitle">Add Success Story</h3>
+        <button class="modal-close" data-close="storyModal" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group span2"><label>Story / Partnership Title *</label><input type="text" id="stm-title" placeholder="Bharat Industries — Talent Pipeline"></div>
+          <div class="form-group">
+            <label>Partnership Category / Tag *</label>
+            <input type="text" id="stm-tag" placeholder="Industry Partnership">
+          </div>
+          <div class="form-group"><label>Key Result / Metric (e.g. 100% Placement Success)</label><input type="text" id="stm-result" placeholder="100% Placement Success"></div>
+          <div class="form-group span2">
+            <label>Cover Image URL (or upload)</label>
+            <input type="text" id="stm-img" placeholder="https://images.unsplash.com/... or /assets/uploads/...">
+            <div id="stm-img-preview-box" style="display:none;margin-top:8px;">
+              <img id="stm-img-preview" src="" style="max-height:80px;border-radius:8px;border:1px solid var(--border);object-fit:cover;">
+            </div>
+          </div>
+          <div class="form-group span2"><label>Story Summary / Details *</label><textarea id="stm-desc" rows="3" placeholder="Recruited 15 freshers from our Power Electronics Track..."></textarea></div>
+          <div class="form-group"><label>Display Order</label><input type="number" id="stm-order" placeholder="0" value="0"></div>
+          <div class="form-group" style="display:flex;align-items:center;gap:8px;margin-top:24px;">
+            <input type="checkbox" id="stm-published" checked style="width:auto;margin:0;">
+            <label for="stm-published" style="margin:0;cursor:pointer;">Published on Collaborate page</label>
+          </div>
+        </div>
+        <input type="hidden" id="stm-editId">
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" data-close="storyModal">Cancel</button>
+        <button class="btn btn-primary" id="saveStoryBtn">💾 Save Story</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL — MEDIA PICKER ═══ -->
+  <div class="modal-overlay" id="mediaPickerModal" role="dialog" aria-modal="true">
+    <div class="modal" style="max-width:850px;width:95%;">
+      <div class="modal-head">
+        <h3>📁 Choose Image from Media Library</h3>
+        <button class="modal-close" data-close="mediaPickerModal" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;">
+          <input type="text" id="mediaPickerSearch" placeholder="Search images..." style="flex:1;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;">
+          <button class="btn btn-primary btn-sm" id="mediaPickerUploadBtn">📤 Upload New</button>
+          <input type="file" id="mediaPickerFileInput" accept="image/*" style="display:none;">
+        </div>
+        <div class="media-picker-grid" id="mediaPickerGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));gap:12px;max-height:400px;overflow-y:auto;padding:4px;">
+          <!-- Items rendered here -->
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" data-close="mediaPickerModal">Cancel</button>
       </div>
     </div>
   </div>

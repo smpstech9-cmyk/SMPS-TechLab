@@ -8,7 +8,7 @@ from flask_cors import CORS
 import jwt
 import hashlib
 
-SECRET_KEY = 'smps_super_secret_key_2026'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'smps_super_secret_production_key_2026_tech_lab_division')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__, static_folder=BASE_DIR, static_url_path='')
@@ -150,6 +150,8 @@ def init_db():
             name TEXT,
             role TEXT,
             type TEXT,
+            designation TEXT,
+            organization TEXT,
             initials TEXT,
             img TEXT,
             expertise TEXT,
@@ -157,9 +159,27 @@ def init_db():
             quote TEXT,
             achievements TEXT,
             linkedin TEXT,
-            email TEXT
+            email TEXT,
+            website TEXT,
+            displayOrder INTEGER DEFAULT 0,
+            published INTEGER DEFAULT 1,
+            created_at TEXT
         )
     ''')
+
+    # Safe column migrations for execom
+    for col, col_type in [
+        ('designation', 'TEXT'),
+        ('organization', 'TEXT'),
+        ('website', 'TEXT'),
+        ('displayOrder', 'INTEGER DEFAULT 0'),
+        ('published', 'INTEGER DEFAULT 1'),
+        ('created_at', 'TEXT')
+    ]:
+        try:
+            c.execute(f"ALTER TABLE execom ADD COLUMN {col} {col_type}")
+        except Exception:
+            pass
 
     c.execute('''
         CREATE TABLE IF NOT EXISTS events (
@@ -169,7 +189,10 @@ def init_db():
             date TEXT,
             month TEXT,
             day TEXT,
+            time TEXT,
             location TEXT,
+            venue TEXT,
+            registrationUrl TEXT,
             img TEXT,
             desc TEXT,
             fullDesc TEXT,
@@ -177,13 +200,27 @@ def init_db():
             agenda TEXT,
             prerequisites TEXT,
             seats TEXT,
-            is_featured INTEGER DEFAULT 0
+            status TEXT DEFAULT 'Upcoming',
+            is_featured INTEGER DEFAULT 0,
+            displayOrder INTEGER DEFAULT 0,
+            published INTEGER DEFAULT 1,
+            created_at TEXT
         )
     ''')
-    try:
-        c.execute("ALTER TABLE events ADD COLUMN is_featured INTEGER DEFAULT 0")
-    except Exception:
-        pass
+    for col, col_type in [
+        ('is_featured', 'INTEGER DEFAULT 0'),
+        ('venue', 'TEXT'),
+        ('time', 'TEXT'),
+        ('registrationUrl', 'TEXT'),
+        ('status', "TEXT DEFAULT 'Upcoming'"),
+        ('displayOrder', 'INTEGER DEFAULT 0'),
+        ('published', 'INTEGER DEFAULT 1'),
+        ('created_at', 'TEXT')
+    ]:
+        try:
+            c.execute(f"ALTER TABLE events ADD COLUMN {col} {col_type}")
+        except Exception:
+            pass
 
     try:
         c.execute("ALTER TABLE products ADD COLUMN img TEXT")
@@ -196,9 +233,86 @@ def init_db():
             category TEXT,
             title TEXT,
             desc TEXT,
-            img TEXT
+            img TEXT,
+            displayOrder INTEGER DEFAULT 0,
+            published INTEGER DEFAULT 1,
+            created_at TEXT
         )
     ''')
+    for col, col_type in [
+        ('displayOrder', 'INTEGER DEFAULT 0'),
+        ('published', 'INTEGER DEFAULT 1'),
+        ('created_at', 'TEXT')
+    ]:
+        try:
+            c.execute(f"ALTER TABLE gallery ADD COLUMN {col} {col_type}")
+        except Exception:
+            pass
+
+    # Ensure existing gallery items have created_at set
+    c.execute("UPDATE gallery SET created_at = datetime('now') WHERE created_at IS NULL OR created_at = ''")
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS success_stories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            description TEXT,
+            organization TEXT,
+            image TEXT,
+            category TEXT,
+            result TEXT,
+            link TEXT,
+            displayOrder INTEGER DEFAULT 0,
+            published INTEGER DEFAULT 1,
+            created_at TEXT
+        )
+    ''')
+
+    # Seed default success stories if empty
+    c.execute("SELECT COUNT(*) FROM success_stories")
+    if c.fetchone()[0] == 0:
+        default_stories = [
+            (
+                "Bharat Industries — Talent Pipeline",
+                "Recruited 15 freshers from our 'Power Electronics Track'. Result: Zero training time needed; students were productive from Day 1.",
+                "Bharat Industries",
+                "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800",
+                "Industry Partnership",
+                "100% Placement Success",
+                "contact.html",
+                1,
+                1,
+                datetime.datetime.utcnow().isoformat()
+            ),
+            (
+                "VTU Bridge Initiative",
+                "Implemented our 'Industry Bridge' module for 100 final-year students. Achieved a 40% increase in campus placement rates.",
+                "VTU Research",
+                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800",
+                "Academic Partnership",
+                "40% Higher Placement",
+                "contact.html",
+                2,
+                1,
+                datetime.datetime.utcnow().isoformat()
+            ),
+            (
+                "TechVista Solutions — Talent Scaling",
+                "Built a custom 'AI Implementation' track to train 20 interns specifically for TechVista's unique product stack.",
+                "TechVista Solutions",
+                "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800",
+                "Startup Support",
+                "Trained & Hired in 3 Months",
+                "contact.html",
+                3,
+                1,
+                datetime.datetime.utcnow().isoformat()
+            )
+        ]
+        c.executemany('''
+            INSERT INTO success_stories (title, description, organization, image, category, result, link, displayOrder, published, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', default_stories)
 
     c.execute('''
         CREATE TABLE IF NOT EXISTS patents (
@@ -351,6 +465,7 @@ def upload_file(current_user):
 
 # --- Auth Routes ---
 @app.route('/api/auth/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json(silent=True) or {}
     if not data or not data.get('username') or not data.get('password'):
@@ -640,19 +755,44 @@ def resolve_image_endpoint():
     return jsonify({'resolved': resolved})
 
 
-# --- Execom Routes ---
+# --- Execom & Advisory Routes ---
 @app.route('/api/execom', methods=['GET'])
 def get_execom():
+    member_type = request.args.get('type')
+    published_only = request.args.get('published') == '1'
+    
     conn = get_db_connection()
-    members = conn.execute('SELECT * FROM execom ORDER BY id ASC').fetchall()
+    query = 'SELECT * FROM execom'
+    params = []
+    conditions = []
+    
+    if member_type:
+        if member_type in ['advisory', 'advisor']:
+            conditions.append("(type = 'advisory' OR type = 'advisor')")
+        elif member_type in ['minds', 'execom', 'leadership']:
+            conditions.append("(type = 'execom' OR type = 'minds' OR type = 'leadership')")
+        elif member_type in ['core_team', 'team']:
+            conditions.append("(type = 'core_team' OR type = 'team')")
+        else:
+            conditions.append("type = ?")
+            params.append(member_type)
+            
+    if published_only:
+        conditions.append("(published IS NULL OR published = 1)")
+        
+    if conditions:
+        query += ' WHERE ' + ' AND '.join(conditions)
+        
+    query += ' ORDER BY displayOrder ASC, id ASC'
+    members = conn.execute(query, params).fetchall()
     conn.close()
     
     result = []
     for m in members:
         d = dict(m)
         try:
-            d['achievements'] = json.loads(d['achievements']) if d['achievements'] else []
-        except:
+            d['achievements'] = json.loads(d['achievements']) if d.get('achievements') else []
+        except Exception:
             d['achievements'] = []
         result.append(d)
     return jsonify(result)
@@ -667,12 +807,15 @@ def create_execom(current_user):
     conn = get_db_connection()
     c = conn.cursor()
     c.execute('''
-        INSERT INTO execom (name, role, type, initials, img, expertise, bio, quote, achievements, linkedin, email)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO execom (name, role, type, designation, organization, initials, img, expertise, bio, quote, achievements, linkedin, email, website, displayOrder, published, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
-        data.get('name'), data.get('role'), data.get('type'), data.get('initials'),
+        data.get('name'), data.get('role'), data.get('type', 'execom'),
+        data.get('designation'), data.get('organization'), data.get('initials'),
         resolved_img, data.get('expertise'), data.get('bio'), data.get('quote'),
-        json.dumps(data.get('achievements', [])), data.get('linkedin'), data.get('email')
+        json.dumps(data.get('achievements', [])), data.get('linkedin'), data.get('email'),
+        data.get('website'), data.get('displayOrder', 0), 1 if data.get('published', True) else 0,
+        datetime.datetime.utcnow().isoformat()
     ))
     conn.commit()
     member_id = c.lastrowid
@@ -689,13 +832,18 @@ def update_execom(current_user, id):
     conn = get_db_connection()
     conn.execute('''
         UPDATE execom SET 
-            name = ?, role = ?, type = ?, initials = ?, img = ?, expertise = ?, 
-            bio = ?, quote = ?, achievements = ?, linkedin = ?, email = ?
+            name = ?, role = ?, type = ?, designation = ?, organization = ?, 
+            initials = ?, img = ?, expertise = ?, bio = ?, quote = ?, 
+            achievements = ?, linkedin = ?, email = ?, website = ?, 
+            displayOrder = ?, published = ?
         WHERE id = ?
     ''', (
-        data.get('name'), data.get('role'), data.get('type'), data.get('initials'),
+        data.get('name'), data.get('role'), data.get('type', 'execom'),
+        data.get('designation'), data.get('organization'), data.get('initials'),
         resolved_img, data.get('expertise'), data.get('bio'), data.get('quote'),
-        json.dumps(data.get('achievements', [])), data.get('linkedin'), data.get('email'), id
+        json.dumps(data.get('achievements', [])), data.get('linkedin'), data.get('email'),
+        data.get('website'), data.get('displayOrder', 0), 1 if data.get('published', True) else 0,
+        id
     ))
     conn.commit()
     conn.close()
@@ -713,16 +861,33 @@ def delete_execom(current_user, id):
 # --- Events Routes ---
 @app.route('/api/events', methods=['GET'])
 def get_events():
+    status = request.args.get('status')
+    published_only = request.args.get('published') == '1'
+    
     conn = get_db_connection()
-    events = conn.execute('SELECT * FROM events ORDER BY id ASC').fetchall()
+    query = 'SELECT * FROM events'
+    conditions = []
+    params = []
+    
+    if status:
+        conditions.append("status = ?")
+        params.append(status)
+    if published_only:
+        conditions.append("(published IS NULL OR published = 1)")
+        
+    if conditions:
+        query += ' WHERE ' + ' AND '.join(conditions)
+        
+    query += ' ORDER BY is_featured DESC, displayOrder ASC, date DESC, id DESC'
+    events = conn.execute(query, params).fetchall()
     conn.close()
     
     result = []
     for e in events:
         d = dict(e)
         try:
-            d['speakers'] = json.loads(d['speakers']) if d['speakers'] else []
-        except:
+            d['speakers'] = json.loads(d['speakers']) if d.get('speakers') else []
+        except Exception:
             d['speakers'] = []
         result.append(d)
     return jsonify(result)
@@ -740,13 +905,16 @@ def create_event(current_user):
     if is_featured == 1:
         c.execute('UPDATE events SET is_featured = 0')
     c.execute('''
-        INSERT INTO events (name, type, date, month, day, location, img, desc, fullDesc, speakers, agenda, prerequisites, seats, is_featured)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO events (name, type, date, month, day, time, location, venue, registrationUrl, img, desc, fullDesc, speakers, agenda, prerequisites, seats, status, is_featured, displayOrder, published, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('name'), data.get('type'), data.get('date'), data.get('month'),
-        data.get('day'), data.get('location'), resolved_img, data.get('desc'),
+        data.get('day'), data.get('time'), data.get('location'), data.get('venue'),
+        data.get('registrationUrl'), resolved_img, data.get('desc'),
         data.get('fullDesc'), json.dumps(data.get('speakers', [])), data.get('agenda'),
-        data.get('prerequisites'), data.get('seats'), is_featured
+        data.get('prerequisites'), data.get('seats'), data.get('status', 'Upcoming'),
+        is_featured, data.get('displayOrder', 0), 1 if data.get('published', True) else 0,
+        datetime.datetime.utcnow().isoformat()
     ))
     conn.commit()
     event_id = c.lastrowid
@@ -763,17 +931,21 @@ def update_event(current_user, id):
     conn = get_db_connection()
     is_featured = 1 if data.get('is_featured') else 0
     if is_featured == 1:
-        conn.execute('UPDATE events SET is_featured = 0')
+        conn.execute('UPDATE events SET is_featured = 0 WHERE id != ?', (id,))
     conn.execute('''
         UPDATE events SET 
-            name = ?, type = ?, date = ?, month = ?, day = ?, location = ?, 
-            img = ?, desc = ?, fullDesc = ?, speakers = ?, agenda = ?, prerequisites = ?, seats = ?, is_featured = ?
+            name = ?, type = ?, date = ?, month = ?, day = ?, time = ?, location = ?, 
+            venue = ?, registrationUrl = ?, img = ?, desc = ?, fullDesc = ?, 
+            speakers = ?, agenda = ?, prerequisites = ?, seats = ?, status = ?, 
+            is_featured = ?, displayOrder = ?, published = ?
         WHERE id = ?
     ''', (
         data.get('name'), data.get('type'), data.get('date'), data.get('month'),
-        data.get('day'), data.get('location'), resolved_img, data.get('desc'),
+        data.get('day'), data.get('time'), data.get('location'), data.get('venue'),
+        data.get('registrationUrl'), resolved_img, data.get('desc'),
         data.get('fullDesc'), json.dumps(data.get('speakers', [])), data.get('agenda'),
-        data.get('prerequisites'), data.get('seats'), is_featured, id
+        data.get('prerequisites'), data.get('seats'), data.get('status', 'Upcoming'),
+        is_featured, data.get('displayOrder', 0), 1 if data.get('published', True) else 0, id
     ))
     conn.commit()
     conn.close()
@@ -792,7 +964,7 @@ def delete_event(current_user, id):
 @app.route('/api/gallery', methods=['GET'])
 def get_gallery():
     conn = get_db_connection()
-    gallery = conn.execute('SELECT * FROM gallery ORDER BY id DESC').fetchall()
+    gallery = conn.execute('SELECT * FROM gallery ORDER BY created_at DESC, id DESC').fetchall()
     conn.close()
     return jsonify([dict(g) for g in gallery])
 
@@ -806,10 +978,12 @@ def create_gallery(current_user):
     conn = get_db_connection()
     c = conn.cursor()
     c.execute('''
-        INSERT INTO gallery (category, title, desc, img)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO gallery (category, title, desc, img, displayOrder, published, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', (
-        data.get('category'), data.get('title'), data.get('desc'), resolved_img
+        data.get('category'), data.get('title'), data.get('desc'), resolved_img,
+        data.get('displayOrder', 0), 1 if data.get('published', True) else 0,
+        datetime.datetime.utcnow().isoformat()
     ))
     conn.commit()
     gallery_id = c.lastrowid
@@ -826,10 +1000,11 @@ def update_gallery(current_user, id):
     conn = get_db_connection()
     conn.execute('''
         UPDATE gallery SET 
-            category = ?, title = ?, desc = ?, img = ?
+            category = ?, title = ?, desc = ?, img = ?, displayOrder = ?, published = ?
         WHERE id = ?
     ''', (
-        data.get('category'), data.get('title'), data.get('desc'), resolved_img, id
+        data.get('category'), data.get('title'), data.get('desc'), resolved_img,
+        data.get('displayOrder', 0), 1 if data.get('published', True) else 0, id
     ))
     conn.commit()
     conn.close()
@@ -843,6 +1018,114 @@ def delete_gallery(current_user, id):
     conn.commit()
     conn.close()
     return jsonify({'success': True})
+
+# --- Success Stories Routes ---
+@app.route('/api/stories', methods=['GET'])
+def get_stories():
+    published_only = request.args.get('published') == '1'
+    conn = get_db_connection()
+    query = 'SELECT * FROM success_stories'
+    if published_only:
+        query += ' WHERE (published IS NULL OR published = 1)'
+    query += ' ORDER BY displayOrder ASC, id DESC'
+    stories = conn.execute(query).fetchall()
+    conn.close()
+    return jsonify([dict(s) for s in stories])
+
+@app.route('/api/stories', methods=['POST'])
+@token_required
+def create_story(current_user):
+    data = request.get_json(silent=True) or {}
+    img_url = data.get('image') or data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO success_stories (title, description, organization, image, category, result, link, displayOrder, published, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        data.get('title'), data.get('description'), data.get('organization'),
+        resolved_img, data.get('category'), data.get('result'), data.get('link'),
+        data.get('displayOrder', 0), 1 if data.get('published', True) else 0,
+        datetime.datetime.utcnow().isoformat()
+    ))
+    conn.commit()
+    story_id = c.lastrowid
+    conn.close()
+    return jsonify({'success': True, 'id': story_id}), 201
+
+@app.route('/api/stories/<int:id>', methods=['PUT'])
+@token_required
+def update_story(current_user, id):
+    data = request.get_json(silent=True) or {}
+    img_url = data.get('image') or data.get('img') or ''
+    resolved_img = resolve_og_image(img_url)
+    
+    conn = get_db_connection()
+    conn.execute('''
+        UPDATE success_stories SET 
+            title = ?, description = ?, organization = ?, image = ?, 
+            category = ?, result = ?, link = ?, displayOrder = ?, published = ?
+        WHERE id = ?
+    ''', (
+        data.get('title'), data.get('description'), data.get('organization'),
+        resolved_img, data.get('category'), data.get('result'), data.get('link'),
+        data.get('displayOrder', 0), 1 if data.get('published', True) else 0, id
+    ))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+@app.route('/api/stories/<int:id>', methods=['DELETE'])
+@token_required
+def delete_story(current_user, id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM success_stories WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+# --- Media Library Routes ---
+@app.route('/api/media', methods=['GET'])
+def get_media_library():
+    uploads_dir = os.path.join(BASE_DIR, 'assets', 'uploads')
+    if not os.path.exists(uploads_dir):
+        return jsonify([])
+    
+    files_list = []
+    for fname in os.listdir(uploads_dir):
+        if fname.startswith('.') or fname.startswith('._'):
+            continue
+        fpath = os.path.join(uploads_dir, fname)
+        if os.path.isfile(fpath):
+            stat = os.stat(fpath)
+            size_kb = round(stat.st_size / 1024, 1)
+            size_str = f"{size_kb} KB" if size_kb < 1024 else f"{round(size_kb/1024, 2)} MB"
+            created_iso = datetime.datetime.fromtimestamp(stat.st_mtime).isoformat()
+            files_list.append({
+                'filename': fname,
+                'url': f'/assets/uploads/{fname}',
+                'size': stat.st_size,
+                'size_formatted': size_str,
+                'created_at': created_iso
+            })
+    
+    files_list.sort(key=lambda x: x['created_at'], reverse=True)
+    return jsonify(files_list)
+
+@app.route('/api/media/<path:filename>', methods=['DELETE'])
+@token_required
+def delete_media_file(current_user, filename):
+    safe_name = os.path.basename(filename)
+    filepath = os.path.join(BASE_DIR, 'assets', 'uploads', safe_name)
+    if os.path.exists(filepath):
+        try:
+            os.remove(filepath)
+            return jsonify({'success': True})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    return jsonify({'error': 'File not found'}), 404
 
 # --- Patents Routes ---
 @app.route('/api/patents', methods=['GET'])

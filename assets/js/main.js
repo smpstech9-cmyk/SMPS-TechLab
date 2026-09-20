@@ -234,7 +234,7 @@ async function initializeAwardsPopup() {
         img.onerror = () => {
             if (img.dataset.triedFallback === 'false') {
                 img.dataset.triedFallback = 'true';
-                img.src = createImageUrl(imageFallbackPath, name);
+                img.src = createImageUrl(imageFallbackPath + name);
             } else {
                 card.style.display = 'none';
             }
@@ -353,7 +353,12 @@ async function initializeAwardsPopup() {
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    setTimeout(openPopup, 600);
+
+    // Only auto-open once per session
+    if (!sessionStorage.getItem('awardsPopupShown')) {
+        sessionStorage.setItem('awardsPopupShown', 'true');
+        setTimeout(openPopup, 600);
+    }
 }
 
 initializeAwardsPopup();

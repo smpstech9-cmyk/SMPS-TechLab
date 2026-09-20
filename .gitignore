@@ -1,18 +1,15 @@
-# Python virtual environment
+# Python
 venv/
 __pycache__/
 *.pyc
 
-# macOS metadata files
+# macOS metadata
 ._*
 .DS_Store
 
-# Scratch files
+# Database (don't commit runtime data)
+smps.db
+
+# Scratch/temp
 scratch/
-
 *.zip
-.DS_Store
-._*
-*.zip
-.DS_Store
-._*

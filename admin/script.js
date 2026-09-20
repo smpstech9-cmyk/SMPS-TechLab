@@ -546,11 +546,13 @@ const Nav = (() => {
     home:        ['Home Page',           'Edit homepage content'],
     about:       ['About Page',          'Company story, team & values'],
     products:    ['Products',            'Manage product catalog'],
-    execom:      ['Execom',              'Manage committee & advisors'],
+    execom:      ['Minds Behind Mission', 'Manage committee & core team'],
+    advisors:    ['Advisory Members',    'Manage Strategic Advisors'],
     events:      ['Events',              'Manage upcoming events'],
     gallery:     ['Gallery',             'Manage gallery items'],
     ip:          ['IP Portfolio',        'Patents & research assets'],
-    collaborate: ['Collaborate Page',    'Partnership content'],
+    collaborate: ['Collaborate & Stories', 'Partnerships & case studies'],
+    media:       ['Media Library',       'Browse & manage uploaded assets'],
     careers:     ['Careers',             'Job openings & internships'],
     ecosystem:   ['Ecosystem',           'Partners & events'],
     insights:    ['Insights & Blog',     'Posts & articles'],
@@ -561,6 +563,13 @@ const Nav = (() => {
   };
 
   function showPage(id) {
+    if (id === 'advisors') {
+      showPage('execom');
+      const advBtn = document.querySelector('#execomFilterPills [data-filter="advisor"]');
+      if (advBtn) advBtn.click();
+      return;
+    }
+
     // Hide all pages
     document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -605,6 +614,7 @@ const Nav = (() => {
       home:        () => Home.loadFields(),
       ecosystem:   () => Ecosystem.loadFields(),
       collaborate: () => Collab.loadFields(),
+      media:       () => MediaLibrary.load(),
       proposals:   () => Proposals.render(),
       settings:    () => Settings.loadFields(),
     };
@@ -3876,7 +3886,7 @@ const Collab = (() => {
     });
     d.stories = collectStories();
 
-    const token = localStorage.getItem('smps_token');
+    const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
     if (token) {
       try {
         await fetch('/api/settings/collabData', {
@@ -4442,13 +4452,285 @@ const Settings = (() => {
 })();
 
 /* ════════════════════════════════════════
+   MEDIA LIBRARY MODULE
+   ════════════════════════════════════════ */
+
+const MediaLibrary = (() => {
+  let mediaItems = [];
+  let currentSearch = '';
+  let pickerCallback = null;
+
+  async function load() {
+    try {
+      const res = await fetch('/api/media?_=' + Date.now());
+      if (res.ok) {
+        mediaItems = await res.json();
+        render();
+        return;
+      }
+    } catch (e) {
+      console.warn('Failed to fetch media library:', e);
+    }
+    mediaItems = [];
+    render();
+  }
+
+  function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  function render() {
+    const grid = Utils.el('mediaGrid');
+    const badge = Utils.el('mediaCountBadge');
+    if (!grid) return;
+
+    const filtered = mediaItems.filter(item => {
+      return !currentSearch || item.name.toLowerCase().includes(currentSearch);
+    });
+
+    if (badge) badge.textContent = `${filtered.length} asset${filtered.length === 1 ? '' : 's'}`;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;padding:48px 20px;">
+          <div class="es-icon">📁</div>
+          <h3>No media files found</h3>
+          <p>Upload images or assets to manage them in your local media library.</p>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(item => `
+      <div class="media-card" data-filename="${Utils.sanitize(item.name)}">
+        <div class="media-card-preview">
+          ${item.is_image
+            ? `<img src="${item.url}" alt="${Utils.sanitize(item.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400'">`
+            : `<div style="font-size:40px;">🎬</div>`}
+        </div>
+        <div class="media-card-body">
+          <div class="media-card-name" title="${Utils.sanitize(item.name)}">${Utils.sanitize(item.name)}</div>
+          <div class="media-card-meta">
+            <span>${formatBytes(item.size)}</span>
+            <span>${Utils.fmtDate(item.mtime * 1000)}</span>
+          </div>
+          <div class="media-card-actions">
+            <button type="button" class="btn btn-secondary btn-sm copy-media-btn" data-url="${item.url}" style="flex:1;font-size:12px;">📋 Copy Link</button>
+            <button type="button" class="btn btn-danger btn-sm delete-media-btn" data-name="${Utils.sanitize(item.name)}" style="font-size:12px;">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function uploadFiles(files) {
+    if (!files || !files.length) return;
+    const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+    let successCount = 0;
+
+    Toast.show(`⏳ Uploading ${files.length} file(s)...`, 'info');
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append('file', file);
+      const headers = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', headers, body: formData });
+        if (res.ok) {
+          successCount++;
+        }
+      } catch (err) {
+        console.error('File upload failed:', err);
+      }
+    }
+
+    if (successCount > 0) {
+      Toast.show(`✅ Uploaded ${successCount} file(s) successfully!`, 'success');
+      await load();
+    } else {
+      Toast.show('❌ Failed to upload files.', 'error');
+    }
+  }
+
+  async function deleteFile(filename) {
+    const yes = await Confirm.ask(`Delete "${filename}"? This will permanently remove it from the server.`);
+    if (!yes) return;
+
+    const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+    try {
+      const res = await fetch(`/api/media/${encodeURIComponent(filename)}`, {
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      if (res.ok) {
+        Toast.show('🗑️ Media file deleted.', 'success');
+        await load();
+      } else {
+        const err = await res.json();
+        Toast.show(`⚠️ Delete failed: ${err.error || 'Server error'}`, 'error');
+      }
+    } catch (e) {
+      Toast.show('⚠️ Delete request failed.', 'error');
+    }
+  }
+
+  function openPicker(callback) {
+    pickerCallback = callback;
+    const modal = Utils.el('mediaPickerModal');
+    if (!modal) return;
+
+    renderPickerGrid();
+    Modal.open('mediaPickerModal');
+
+    // Load fresh items
+    fetch('/api/media?_=' + Date.now())
+      .then(res => res.ok ? res.json() : [])
+      .then(items => {
+        mediaItems = items;
+        renderPickerGrid();
+      })
+      .catch(() => {});
+  }
+
+  function renderPickerGrid() {
+    const grid = Utils.el('mediaPickerGrid');
+    const searchVal = (Utils.getVal('mediaPickerSearch') || '').toLowerCase();
+    if (!grid) return;
+
+    const filtered = mediaItems.filter(item => {
+      return item.is_image && (!searchVal || item.name.toLowerCase().includes(searchVal));
+    });
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted);font-size:13px;">No images in media library yet. Upload one above!</div>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map(item => `
+      <div class="media-picker-item" data-url="${item.url}" title="${Utils.sanitize(item.name)}">
+        <img src="${item.url}" alt="${Utils.sanitize(item.name)}" loading="lazy">
+        <div class="picker-name">${Utils.sanitize(item.name)}</div>
+      </div>
+    `).join('');
+  }
+
+  function init() {
+    const fileInput = Utils.el('mediaFileInput');
+    const dropzone = Utils.el('mediaDropzone');
+    const refreshBtn = Utils.el('mediaRefreshBtn');
+    const searchInput = Utils.el('mediaSearchInput');
+    const grid = Utils.el('mediaGrid');
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', (e) => {
+        if (e.target !== fileInput) fileInput.click();
+      });
+
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+          uploadFiles(fileInput.files);
+          fileInput.value = '';
+        }
+      });
+
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+          uploadFiles(e.dataTransfer.files);
+        }
+      });
+    }
+
+    if (refreshBtn) refreshBtn.addEventListener('click', load);
+
+    if (searchInput) {
+      searchInput.addEventListener('input', Utils.debounce(() => {
+        currentSearch = searchInput.value.toLowerCase().trim();
+        render();
+      }, 200));
+    }
+
+    if (grid) {
+      grid.addEventListener('click', (e) => {
+        const copyBtn = e.target.closest('.copy-media-btn');
+        const deleteBtn = e.target.closest('.delete-media-btn');
+
+        if (copyBtn) {
+          const url = copyBtn.dataset.url;
+          navigator.clipboard.writeText(url).then(() => {
+            Toast.show('📋 Image link copied to clipboard!', 'success');
+          }).catch(() => {
+            Toast.show('Copied: ' + url, 'info');
+          });
+        }
+
+        if (deleteBtn) {
+          deleteFile(deleteBtn.dataset.name);
+        }
+      });
+    }
+
+    // Media Picker modal events
+    const pickerSearch = Utils.el('mediaPickerSearch');
+    if (pickerSearch) {
+      pickerSearch.addEventListener('input', Utils.debounce(renderPickerGrid, 200));
+    }
+
+    const pickerUploadBtn = Utils.el('mediaPickerUploadBtn');
+    const pickerFileInput = Utils.el('mediaPickerFileInput');
+    if (pickerUploadBtn && pickerFileInput) {
+      pickerUploadBtn.addEventListener('click', () => pickerFileInput.click());
+      pickerFileInput.addEventListener('change', async () => {
+        if (pickerFileInput.files.length) {
+          await uploadFiles(pickerFileInput.files);
+          pickerFileInput.value = '';
+          renderPickerGrid();
+        }
+      });
+    }
+
+    const pickerGrid = Utils.el('mediaPickerGrid');
+    if (pickerGrid) {
+      pickerGrid.addEventListener('click', (e) => {
+        const item = e.target.closest('.media-picker-item');
+        if (item && item.dataset.url) {
+          if (typeof pickerCallback === 'function') {
+            pickerCallback(item.dataset.url);
+          }
+          Modal.close('mediaPickerModal');
+        }
+      });
+    }
+  }
+
+  return { init, load, openPicker };
+})();
+
+/* ════════════════════════════════════════
    REAL-TIME SUBSCRIPTIONS & STORAGE UPLOADS
    ════════════════════════════════════════ */
 
 const subscriptions = {};
 
 function setupImageUploaders() {
-  const ids = ['pm-img', 'em-img', 'ev-img', 'gm-img'];
+  const ids = ['pm-img', 'em-img', 'ev-img', 'gm-img', 'stm-img', 'hp-heroMedia'];
   ids.forEach(id => {
     const input = document.getElementById(id);
     if (!input) return;
@@ -4456,99 +4738,77 @@ function setupImageUploaders() {
     // Check if uploader already appended
     if (input.parentNode.querySelector('.btn-upload-file')) return;
 
+    const container = document.createElement('div');
+    container.style.cssText = 'display:inline-flex;gap:6px;margin-top:6px;align-items:center;flex-wrap:wrap;';
+
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.accept = 'image/*';
+    fileInput.accept = 'image/*,video/mp4';
     fileInput.style.display = 'none';
 
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn btn-secondary btn-upload-file';
-    btn.textContent = '📤 Upload Image';
-    btn.style.marginLeft = '8px';
-    btn.style.padding = '4px 8px';
-    btn.style.fontSize = '12px';
+    const uploadBtn = document.createElement('button');
+    uploadBtn.type = 'button';
+    uploadBtn.className = 'btn btn-secondary btn-sm btn-upload-file';
+    uploadBtn.textContent = '📤 Upload Image';
+    uploadBtn.style.fontSize = '11px';
+    uploadBtn.style.padding = '4px 8px';
 
-    btn.addEventListener('click', () => fileInput.click());
+    const pickBtn = document.createElement('button');
+    pickBtn.type = 'button';
+    pickBtn.className = 'btn btn-secondary btn-sm btn-pick-media';
+    pickBtn.textContent = '📁 Choose from Library';
+    pickBtn.style.fontSize = '11px';
+    pickBtn.style.padding = '4px 8px';
+
+    uploadBtn.addEventListener('click', () => fileInput.click());
+
+    pickBtn.addEventListener('click', () => {
+      MediaLibrary.openPicker((selectedUrl) => {
+        input.value = selectedUrl;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        Toast.show('Image selected from library!', 'success');
+      });
+    });
 
     fileInput.addEventListener('change', async () => {
       const file = fileInput.files[0];
       if (!file) return;
-      btn.textContent = '⏳ Uploading...';
+      uploadBtn.textContent = '⏳ Uploading...';
       
       let uploadedUrl = null;
-      let firebaseError = null;
-
-      // 1. Try Firebase Cloud Storage first
       try {
-        const firebaseInstance = window.firebase;
-        if (firebaseInstance && typeof firebaseInstance.storage === 'function') {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `img_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${fileExt}`;
-          
-          const storageRef = firebaseInstance.storage().ref();
-          const fileRef = storageRef.child(`uploads/${fileName}`);
-          
-          const snapshot = await fileRef.put(file);
-          uploadedUrl = await snapshot.ref.getDownloadURL();
-        } else {
-          throw new Error('Firebase Storage SDK not available.');
+        const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
+        const formData = new FormData();
+        formData.append('file', file);
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        
+        const res = await fetch('/api/upload', { method: 'POST', headers, body: formData });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) uploadedUrl = data.url;
         }
       } catch (err) {
-        console.warn('Firebase Storage upload failed, falling back to local backend:', err);
-        firebaseError = err.message;
+        console.warn('Local upload failed:', err);
       }
 
-      // 2. Fall back to Flask API upload if Firebase failed
-      if (!uploadedUrl) {
-        try {
-          const token = sessionStorage.getItem('smps_api_token') || localStorage.getItem('smps_token');
-          const formData = new FormData();
-          formData.append('file', file);
-          
-          const headers = {};
-          if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-          }
-          
-          const res = await fetch('/api/upload', {
-            method: 'POST',
-            headers: headers,
-            body: formData
-          });
-          
-          if (res.ok) {
-            const data = await res.json();
-            if (data.url) {
-              uploadedUrl = data.url;
-            } else {
-              throw new Error('No URL in response');
-            }
-          } else {
-            const errData = await res.json();
-            throw new Error(errData.error || 'Failed to upload image');
-          }
-        } catch (err) {
-          console.error('Local image upload fallback failed:', err);
-          btn.textContent = '❌ Failed';
-          const errMsg = firebaseError ? `Firebase error: ${firebaseError}. Local error: ${err.message}` : err.message;
-          Toast.show('Image upload failed: ' + errMsg, 'error');
-          return;
-        }
-      }
-
-      // 3. Apply the uploaded URL to the input
       if (uploadedUrl) {
         input.value = uploadedUrl;
         input.dispatchEvent(new Event('input', { bubbles: true }));
         input.dispatchEvent(new Event('change', { bubbles: true }));
-        btn.textContent = '✅ Uploaded';
+        uploadBtn.textContent = '✅ Uploaded';
         Toast.show('Image uploaded successfully!', 'success');
+      } else {
+        uploadBtn.textContent = '❌ Failed';
+        Toast.show('Upload failed', 'error');
       }
     });
 
-    input.parentNode.appendChild(fileInput);
-    input.parentNode.appendChild(btn);
+    container.appendChild(fileInput);
+    container.appendChild(uploadBtn);
+    container.appendChild(pickBtn);
+    input.parentNode.appendChild(container);
   });
 
   setupImageURLResolvers();
@@ -4744,6 +5004,7 @@ const App = {
     Jobs.init();
     Blogs.init();
     Collab.init();
+    MediaLibrary.init();
     Proposals.init();
     Ecosystem.init();
     Messages.init();

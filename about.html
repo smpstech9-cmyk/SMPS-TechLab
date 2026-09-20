@@ -13,7 +13,7 @@
     <title>About — SMPS Tech Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
 
         :root {
@@ -508,12 +508,77 @@
             margin-top: 6px;
         }
 
-        /* VALUES */
+        /* INNOVATION LANDSCAPE & VALUES */
         .values-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             margin-top: 60px;
+        }
+
+        .innov-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 28px;
+            transition: all .35s cubic-bezier(.4, 0, .2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .innov-card:hover {
+            border-color: rgba(37, 99, 235, .4);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .3), 0 0 20px rgba(37, 99, 235, 0.15);
+        }
+
+        .innov-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .innov-badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            padding: 4px 12px;
+            border-radius: 100px;
+        }
+
+        .innov-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(37, 99, 235, 0.25);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .innov-card h3 {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .innov-card p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.7;
+            flex: 1;
         }
 
         /* TEAM */
@@ -1236,20 +1301,20 @@
                     <h4>Contact Info</h4>
                     <div class="footer-contact">
                         <div class="contact-item">
-                            <span class="ci"></span>
+                            <span class="ci">📍</span>
                             <p>VTU-VRIF-TCOE Building, 1st Main Rd, RHCS Layout, Annasandraswari Nagar, Nagarabhavi,
                                 Bengaluru, Karnataka 560091</p>
                         </div>
                         <div class="contact-item">
-                            <span class="ci"></span>
+                            <span class="ci">✉️</span>
                             <p>smpstechlab@gmail.com</p>
                         </div>
                         <div class="contact-item">
-                            <span class="ci"></span>
+                            <span class="ci">📞</span>
                             <p>9035874229 / 8792779543</p>
                         </div>
                         <div class="contact-item">
-                            <span class="ci"></span>
+                            <span class="ci">🕐</span>
                             <p>10:00 AM – 8:00 PM (All days, Tuesday Holiday)</p>
                         </div>
                     </div>
@@ -1272,30 +1337,7 @@
     
 
     <script>
-        // Theme Toggle Logic
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const htmlElement = document.documentElement;
         
-        function updateIcon(theme) {
-            if (theme === 'light') {
-                if (typeof themeIcon !== 'undefined' && themeIcon) themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>'; // Moon
-            } else {
-                if (typeof themeIcon !== 'undefined' && themeIcon) themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; // Sun
-            }
-        }
-
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        htmlElement.setAttribute('data-theme', savedTheme);
-        if (typeof themeIcon !== 'undefined' && themeIcon) updateIcon(savedTheme);
-
-        if (typeof themeToggle !== 'undefined' && themeToggle) themeToggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            htmlElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateIcon(newTheme);
-        });
 
         window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50));
         window.obs = new IntersectionObserver(e => e.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); }), { threshold: .15 });
@@ -1437,24 +1479,37 @@
             const container = document.getElementById('valGrid');
             if (!container || !Array.isArray(vals)) return;
 
-            container.innerHTML = vals.map(val => `
-                <div class="card reveal">
-                    <div class="card-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--accent); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                        ${getDomainIconSvg(val.icon || val.title)}
+            container.innerHTML = vals.map(val => {
+                const category = val.category || 'DeepTech Domain';
+                return `
+                    <div class="innov-card reveal">
+                        <div class="innov-card-top">
+                            <span class="innov-badge">${category}</span>
+                            <div class="innov-icon">
+                                ${getDomainIconSvg(val.icon || val.title)}
+                            </div>
+                        </div>
+                        <h3>${val.title || ''}</h3>
+                        <p>${val.desc || ''}</p>
                     </div>
-                    <h3>${val.title || ''}</h3>
-                    <p>${val.desc || ''}</p>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function renderAchievements(achs) {
             const container = document.getElementById('achGrid');
             if (!container || !Array.isArray(achs)) return;
 
-            container.innerHTML = achs.map(ach => `
+            const achIcons = [
+                `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>`,
+                `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`,
+                `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17 2 2a1 1 0 0 0 1.4 0l6.6-6.6a2 2 0 0 0 0-2.8l-1.4-1.4a2 2 0 0 0-2.8 0L15 10"/><path d="m18 15 2 2a1 1 0 0 1 0 1.4l-2 2a2 2 0 0 1-2.8 0L13 18"/><path d="m2 14 6 6"/><path d="M7 8 2 13"/><path d="m11 3 4 4"/><path d="m10 7 5 5"/></svg>`,
+                `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`
+            ];
+
+            container.innerHTML = achs.map((ach, idx) => `
                 <div class="ach-card reveal">
-                    <div class="ach-icon"></div>
+                    <div class="ach-icon" style="color:var(--accent);margin-bottom:12px;display:flex;align-items:center;justify-content:center;">${achIcons[idx % achIcons.length]}</div>
                     <div class="ach-num">${ach.num || '0'}</div>
                     <div class="ach-label">${ach.label || ''}</div>
                 </div>
@@ -1491,9 +1546,21 @@
                 }
             }
 
-            // Fallback to default
+            // Fallback to SiteContent or default
             if (!aboutData) {
-                aboutData = defaultAboutData;
+                if (window.SiteContent && window.SiteContent.about) {
+                    aboutData = {
+                        ...defaultAboutData,
+                        heroTitle: window.SiteContent.about.heroTitle,
+                        heroSub: window.SiteContent.about.heroSub,
+                        vision: window.SiteContent.about.vision,
+                        mission: window.SiteContent.about.mission,
+                        values: window.SiteContent.about.innovationLandscape || defaultAboutData.values,
+                        achievements: window.SiteContent.about.achievements || defaultAboutData.achievements
+                    };
+                } else {
+                    aboutData = defaultAboutData;
+                }
             }
             if (!aboutData || typeof aboutData !== 'object') return;
             
@@ -1612,9 +1679,10 @@
             </svg>
         </div>
     </a>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="assets/js/firebase-init.js?v=1.0.1"></script>
-    <script src="assets/js/main.js?v=1.0.1"></script>
+    <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+    <script src="assets/js/siteContent.js?v=1.0.2"></script>
+    <script src="assets/js/firebase-init.js?v=1.0.2"></script>
+    <script src="assets/js/main.js?v=1.0.2"></script>
 
     <div class="toast" id="toast"> Subscribed successfully!</div>
 </body>

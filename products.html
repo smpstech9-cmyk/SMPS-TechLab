@@ -15,8 +15,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300&family=Space+Grotesk:wght@300;400;500;600;700&family=Source+Sans+3:wght@400;600;700;800&display=swap"
         rel="stylesheet">
+    <script src="assets/js/siteContent.js"></script>
     <style>
         /* =============================================
            SMPS TECH LAB — PREMIUM INDUSTRIAL PRODUCT PAGE
@@ -844,6 +845,13 @@
             color: var(--prod-blue) !important;
             transform: translateY(-1px);
         }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--prod-card-bg);
+            border: 1px solid var(--prod-border);
             color: var(--prod-text);
             padding: 12px 22px;
             border-radius: 10px;
@@ -1728,20 +1736,20 @@
                     <h4>Contact Info</h4>
                     <div class="footer-contact">
                         <div class="contact-item">
-                            <span class="ci"></span>
+                            <span class="ci">📍</span>
                             <p>VTU-VRIF-TCOE Building, 1st Main Rd, RHCS Layout, Annasandraswari Nagar, Nagarabhavi,
                                 Bengaluru, Karnataka 560091</p>
                         </div>
                         <div class="contact-item">
-                            <span class="ci"></span>
+                            <span class="ci">✉️</span>
                             <p>smpstechlab@gmail.com</p>
                         </div>
                         <div class="contact-item">
-                            <span class="ci"></span>
+                            <span class="ci">📞</span>
                             <p>9035874229 / 8792779543</p>
                         </div>
                         <div class="contact-item">
-                            <span class="ci"></span>
+                            <span class="ci">🕐</span>
                             <p>10:00 AM – 8:00 PM (All days, Tuesday Holiday)</p>
                         </div>
                     </div>
@@ -1797,28 +1805,7 @@
             }
         })();
 
-        // ─── Theme ───────────────────────────────────────────────────────────
-        const htmlElement = document.documentElement;
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
 
-        function updateIcon(theme) {
-            if (!themeIcon) return;
-            themeIcon.innerHTML = theme === 'light'
-                ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>'
-                : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-        }
-
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        htmlElement.setAttribute('data-theme', savedTheme);
-        updateIcon(savedTheme);
-
-        document.getElementById('themeToggleNav')?.addEventListener('click', () => {
-            const t = htmlElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-            htmlElement.setAttribute('data-theme', t);
-            localStorage.setItem('theme', t);
-            updateIcon(t);
-        });
 
         window.addEventListener('scroll', () =>
             document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50));
@@ -2626,51 +2613,7 @@
             window.location.hash = 'product-' + id;
         }
 
-        // ─── Mockup tab switcher ──────────────────────────────────────────────
-        function switchMockupTab(tab) {
-            const content = document.getElementById('mockupContentArea');
-            const items = document.querySelectorAll('.sidebar-item');
-            items.forEach(item => item.classList.remove('active'));
-            let clickedIndex = tab === 'electronics' ? 0 : tab === 'ai' ? 1 : 2;
-            if (items[clickedIndex]) items[clickedIndex].classList.add('active');
 
-            const tabContent = {
-                electronics: `
-                    <div class="code-editor">
-                        <span class="code-line"><span class="c-keyword">import</span> smps_control <span class="c-keyword">as</span> control</span>
-                        <span class="code-line"><span class="c-keyword">sys</span> = control.InitializeSystem(voltage=400, frequency=50)</span>
-                        <span class="code-line"><span class="c-keyword">sys</span>.optimize_efficiency(threshold=0.985)</span>
-                        <span class="code-line"><span class="c-comment"># Status: Operational (98.6% efficiency achieved)</span></span>
-                    </div>
-                    <div class="mockup-telemetry">
-                        <div class="telemetry-card"><span class="tel-label">SYSTEM EFFICIENCY</span><span class="tel-value" style="color:var(--accent)">98.62%</span></div>
-                        <div class="telemetry-card"><span class="tel-label">GRID FREQUENCY</span><span class="tel-value" style="color:var(--accent)">50.02 Hz</span></div>
-                    </div>`,
-                ai: `
-                    <div class="code-editor">
-                        <span class="code-line"><span class="c-keyword">from</span> smps_ai <span class="c-keyword">import</span> IndustrialModel</span>
-                        <span class="code-line"><span class="c-keyword">model</span> = IndustrialModel.load_weights(<span class="c-keyword">"predictive_main_v4"</span>)</span>
-                        <span class="code-line"><span class="c-keyword">anomaly</span> = model.predict(sensor_data=realtime_feed)</span>
-                        <span class="code-line"><span class="c-comment"># Health Score: 99.8% | Anomaly Probability: 0.002%</span></span>
-                    </div>
-                    <div class="mockup-telemetry">
-                        <div class="telemetry-card"><span class="tel-label">MODEL ACCURACY</span><span class="tel-value" style="color:var(--accent3)">99.45%</span></div>
-                        <div class="telemetry-card"><span class="tel-label">LATENCY SPEED</span><span class="tel-value" style="color:var(--accent3)">1.42 ms</span></div>
-                    </div>`,
-                iot: `
-                    <div class="code-editor">
-                        <span class="code-line"><span class="c-keyword">#include</span> <span class="c-keyword">&lt;smps_iiot.h&gt;</span></span>
-                        <span class="code-line"><span class="c-keyword">WiFiClient</span> client; <span class="c-keyword">PubSubClient</span> mqtt(client);</span>
-                        <span class="code-line"><span class="c-keyword">mqtt</span>.publish(<span class="c-keyword">"smps/factory/nodes/node_7"</span>, payload);</span>
-                        <span class="code-line"><span class="c-comment">// MQTT Publish Success | Node Connected Securely</span></span>
-                    </div>
-                    <div class="mockup-telemetry">
-                        <div class="telemetry-card"><span class="tel-label">ACTIVE NODES</span><span class="tel-value" style="color:var(--accent2)">128 / 128</span></div>
-                        <div class="telemetry-card"><span class="tel-label">PACKET DELIVERY</span><span class="tel-value" style="color:var(--accent2)">100.00%</span></div>
-                    </div>`
-            };
-            if (content && tabContent[tab]) content.innerHTML = tabContent[tab];
-        }
 
         // ─── Init ─────────────────────────────────────────────────────────────
         if ('scrollRestoration' in history) {
@@ -2711,7 +2654,7 @@
             </svg>
         </div>
     </a>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
     <script src="assets/js/firebase-init.js?v=1.0.1"></script>
     <script src="assets/js/main.js?v=1.0.1"></script>
 

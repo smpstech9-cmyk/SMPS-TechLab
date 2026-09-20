@@ -1,10 +1,10 @@
 (function () {
   'use strict';
 
-  // Global fetch interceptor to route relative API calls (starting with /api/) to port 5500 if the frontend is hosted on another port (e.g. VS Code Live Server on 5501)
+  // Global fetch interceptor to route relative API calls (starting with /api/) to port 5002 if the frontend is hosted on another port (e.g. VS Code Live Server on 5500/5501)
   const originalFetch = window.fetch;
   window.fetch = function (input, init) {
-    const backendPort = '5500';
+    const backendPort = '5002';
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     if (isLocal && window.location.port !== backendPort) {
       if (typeof input === 'string') {
